@@ -12,14 +12,85 @@
 
         html {
             scroll-behavior: smooth; /* 平滑滾動效果 */
+            /* Default light mode colors */
+            --bg-primary: #f9f7f7;
+            --bg-secondary: #e3f2fd;
+            --bg-card: white;
+            --bg-card-secondary: #f9fafb; /* gray-50 */
+            --bg-card-active: #eff6ff; /* blue-50 */
+            --bg-card-break: #fff7ed; /* orange-50 */
+            --bg-card-completed: #f0fdf4; /* green-50 */
+            --text-primary: #1f2937; /* gray-800 */
+            --text-secondary: #6b7280; /* gray-500 */
+            --text-title: #1e3a8a; /* blue-800 */
+            --text-button: white;
+            --border-primary: #e5e7eb; /* gray-200 */
+            --border-secondary: #d1d5db; /* gray-300 */
+            --border-active: #bfdbfe; /* blue-300 */
+            --border-break: #fed7aa; /* orange-300 */
+            --border-completed: #bbf7d0; /* green-300 */
+            --input-bg: white;
+            --input-border: #d1d5db;
+            --input-focus-border: #3b82f6;
+            --input-focus-ring: rgba(59, 130, 246, 0.3);
+            --svg-base: #e5e7eb; /* gray-200 */
+            --footer-bg: #1f2937; /* gray-800 */
+            --footer-text: white;
+            --switch-bg-inactive: #ccc;
+            --switch-bg-active: #3b82f6;
+            --fullscreen-bg: rgba(255, 255, 255, 0.7);
+            --fullscreen-hover-bg: rgba(243, 244, 246, 0.9);
+            --fullscreen-icon: #374151; /* gray-700 */
+            --darkmode-icon: #6b7280; /* gray-500 */
+            --darkmode-icon-hover: #1f2937; /* gray-800 */
+            --darkmode-toggle-bg: rgba(255, 255, 255, 0.7);
+            --darkmode-toggle-hover-bg: rgba(243, 244, 246, 0.9);
+        }
+
+        html.dark {
+            /* Dark mode colors */
+            --bg-primary: #111827; /* gray-900 */
+            --bg-secondary: #1f2937; /* gray-800 */
+            --bg-card: #374151; /* gray-700 */
+            --bg-card-secondary: #4b5563; /* gray-600 */
+            --bg-card-active: #1e3a8a; /* dark blue */
+            --bg-card-break: #7c2d12; /* dark orange */
+            --bg-card-completed: #064e3b; /* dark green */
+            --text-primary: #f3f4f6; /* gray-100 */
+            --text-secondary: #9ca3af; /* gray-400 */
+            --text-title: #60a5fa; /* blue-400 */
+            --text-button: white;
+            --border-primary: #4b5563; /* gray-600 */
+            --border-secondary: #6b7280; /* gray-500 */
+            --border-active: #3b82f6; /* blue-500 */
+            --border-break: #f97316; /* orange-500 */
+            --border-completed: #22c55e; /* green-500 */
+            --input-bg: #4b5563; /* gray-600 */
+            --input-border: #6b7280; /* gray-500 */
+            --input-focus-border: #60a5fa; /* blue-400 */
+            --input-focus-ring: rgba(96, 165, 250, 0.4);
+            --svg-base: #4b5563; /* gray-600 */
+            --footer-bg: #000000; /* black */
+            --footer-text: #d1d5db; /* gray-300 */
+            --switch-bg-inactive: #4b5563; /* gray-600 */
+            --switch-bg-active: #60a5fa; /* blue-400 */
+            --fullscreen-bg: rgba(55, 65, 81, 0.7); /* gray-700 */
+            --fullscreen-hover-bg: rgba(75, 85, 99, 0.9); /* gray-600 */
+            --fullscreen-icon: #d1d5db; /* gray-300 */
+            --darkmode-icon: #9ca3af; /* gray-400 */
+            --darkmode-icon-hover: #f3f4f6; /* gray-100 */
+            --darkmode-toggle-bg: rgba(55, 65, 81, 0.7); /* gray-700 */
+            --darkmode-toggle-hover-bg: rgba(75, 85, 99, 0.9); /* gray-600 */
         }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background: linear-gradient(135deg, #f9f7f7 0%, #e3f2fd 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .content {
@@ -28,137 +99,173 @@
 
         .timer-circle {
             position: relative;
-            width: 280px; /* 預設大小 */
+            width: 280px;
             height: 280px;
-            transition: width 0.3s ease, height 0.3s ease; /* 平滑大小變換 */
+            transition: width 0.3s ease, height 0.3s ease;
         }
 
         .timer-circle svg {
             transform: rotate(-90deg);
-            width: 100%; /* SVG 寬度填滿容器 */
-            height: 100%; /* SVG 高度填滿容器 */
+            width: 100%;
+            height: 100%;
         }
-
+        .timer-circle circle#baseCircle {
+             stroke: var(--svg-base);
+             transition: stroke 0.3s ease;
+        }
         .timer-circle circle#timerCircle {
-            transition: stroke 0.3s ease, stroke-dashoffset 0.1s linear; /* 顏色變換平滑，進度條快速更新 */
-             stroke-dasharray: 100 100; /* 使用 pathLength=100 */
-             stroke-dashoffset: 100; /* 從 100% 空白開始 */
+            /* Apply the gradient stroke */
+            stroke: url(#progressGradient);
+            transition: stroke-dashoffset 0.1s linear; /* Only transition offset */
+             stroke-dasharray: 100 100;
+             stroke-dashoffset: 100;
         }
 
         .notification {
             animation: slideIn 0.5s ease-out forwards;
+            color: white;
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        /* 基本按鈕樣式 */
         .btn {
-             padding: 0.75rem 1.5rem; /* py-3 px-6 */
-             border-radius: 0.5rem; /* rounded-lg */
-             font-weight: 500; /* font-medium */
+             padding: 0.75rem 1.5rem;
+             border-radius: 0.5rem;
+             font-weight: 500;
              transition: all 0.3s ease;
-             border: 1px solid transparent; /* 基本邊框 */
+             border: 1px solid transparent;
              cursor: pointer;
-             display: inline-flex; /* 使圖示和文字對齊 */
-             align-items: center; /* 使圖示和文字對齊 */
-             justify-content: center; /* 內容置中 */
-             gap: 0.5rem; /* 圖示和文字間距 */
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             gap: 0.5rem;
         }
-        .btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
+        .btn:disabled { cursor: not-allowed; opacity: 0.6; }
 
-        /* 主要按鈕 (開始/繼續/重新開始) */
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
+            color: var(--text-button);
         }
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-        .btn-primary:disabled {
-            background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
-        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-primary:disabled { background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%); }
+        html.dark .btn-primary { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); }
+        html.dark .btn-primary:hover:not(:disabled) { box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4); }
+        html.dark .btn-primary:disabled { background: linear-gradient(135deg, #374151 0%, #4b5563 100%); opacity: 0.5; }
 
-
-        /* 次要按鈕 (跳過) */
         .btn-secondary {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-             color: white;
+             color: var(--text-button);
         }
-        .btn-secondary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-        }
-         .btn-secondary:disabled {
-             background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
-        }
+        .btn-secondary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+        .btn-secondary:disabled { background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%); }
+        html.dark .btn-secondary { background: linear-gradient(135deg, #fb923c 0%, #f97316 100%); }
+        html.dark .btn-secondary:hover:not(:disabled) { box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4); }
+        html.dark .btn-secondary:disabled { background: linear-gradient(135deg, #4b5563 0%, #52525b 100%); opacity: 0.5; }
 
-        /* 外框按鈕 (用於暫停狀態的切換按鈕) */
         .btn-outline-pause {
-             border-color: #3b82f6; /* blue-500 */
-             color: #3b82f6; /* blue-500 */
-             background-color: white; /* 確保背景是白色 */
+             border-color: #3b82f6;
+             color: #3b82f6;
+             background-color: var(--bg-card);
         }
-        .btn-outline-pause:hover:not(:disabled) {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-        .btn-outline-pause:disabled {
-             border-color: #d1d5db; /* gray-300 */
-             color: #9ca3af; /* gray-500 */
-             background-color: white;
-        }
+        .btn-outline-pause:hover:not(:disabled) { background-color: rgba(59, 130, 246, 0.1); }
+        .btn-outline-pause:disabled { border-color: var(--border-secondary); color: var(--text-secondary); background-color: var(--bg-card); }
+        html.dark .btn-outline-pause { border-color: #60a5fa; color: #60a5fa; background-color: var(--bg-card); }
+        html.dark .btn-outline-pause:hover:not(:disabled) { background-color: rgba(96, 165, 250, 0.15); }
+        html.dark .btn-outline-pause:disabled { border-color: var(--border-secondary); color: var(--text-secondary); background-color: var(--bg-card); }
 
-        /* 外框按鈕 (重置) */
         .btn-outline-reset {
-             border-color: #9ca3af; /* gray-400 */
-             color: #6b7280; /* gray-500 */
-             background-color: white; /* 確保背景是白色 */
+             border-color: var(--border-secondary);
+             color: var(--text-secondary);
+             background-color: var(--bg-card);
         }
-        .btn-outline-reset:hover:not(:disabled) {
-            background-color: rgba(156, 163, 175, 0.1); /* 較淺灰色 */
-        }
-        .btn-outline-reset:disabled {
-             border-color: #d1d5db; /* gray-300 */
-             color: #9ca3af; /* gray-500 */
-             background-color: white;
-        }
+        .btn-outline-reset:hover:not(:disabled) { background-color: rgba(156, 163, 175, 0.1); }
+        .btn-outline-reset:disabled { border-color: #d1d5db; color: #9ca3af; background-color: var(--bg-card); }
+        html.dark .btn-outline-reset { border-color: var(--border-secondary); color: var(--text-secondary); background-color: var(--bg-card); }
+        html.dark .btn-outline-reset:hover:not(:disabled) { background-color: rgba(107, 114, 128, 0.2); }
+        html.dark .btn-outline-reset:disabled { border-color: #4b5563; color: #6b7280; background-color: var(--bg-card); }
 
-
+        .card {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
         .table-card {
             transition: all 0.3s ease;
-            cursor: pointer;
+            background-color: var(--bg-card-secondary);
+            border: 1px solid var(--border-primary);
+            color: var(--text-primary);
+            cursor: pointer; /* All cards are potentially clickable */
+        }
+        .table-card h3 { color: var(--text-primary); transition: color 0.3s ease; }
+        .table-card p { color: var(--text-secondary); transition: color 0.3s ease; }
+        .table-card .status-indicator { background-color: #9ca3af; transition: background-color 0.3s ease; }
+
+        /* Slightly dim completed cards, but keep hover effect */
+        .table-card.completed {
+             opacity: 0.8;
         }
         .table-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+             transform: translateY(-3px);
+             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+        html.dark .table-card:hover { box-shadow: 0 10px 25px rgba(255, 255, 255, 0.05); }
 
-        /* --- 聲音開關 --- */
+
+        /* Active Round Card */
+        .table-card.active-round { background-color: var(--bg-card-active); border-color: var(--border-active); opacity: 1; }
+        .table-card.active-round .status-indicator { background-color: #3b82f6; }
+        html.dark .table-card.active-round .status-indicator { background-color: #60a5fa; }
+
+        /* Active Break Card */
+        .table-card.active-break { background-color: var(--bg-card-break); border-color: var(--border-break); opacity: 1; }
+        .table-card.active-break h3 { color: #c2410c; }
+        html.dark .table-card.active-break h3 { color: #fb923c; }
+        .table-card.active-break .status-indicator { background-color: #f97316; }
+        html.dark .table-card.active-break .status-indicator { background-color: #fb923c; }
+
+        /* Completed Card Styling */
+        .table-card.completed { background-color: var(--bg-card-completed); border-color: var(--border-completed); }
+        .table-card.completed .status-indicator { background-color: #16a34a; }
+        html.dark .table-card.completed .status-indicator { background-color: #4ade80; }
+
+
         .sound-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .sound-switch input { opacity: 0; width: 0; height: 0; }
-        .sound-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .sound-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--switch-bg-inactive); transition: .4s; border-radius: 24px; }
         .sound-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .sound-slider { background-color: #3b82f6; }
+        input:checked + .sound-slider { background-color: var(--switch-bg-active); }
         input:checked + .sound-slider:before { transform: translateX(26px); }
-        /* --- 結束 聲音開關 --- */
 
         footer {
             margin-top: auto;
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* --- 時間輸入 --- */
+        .styled-input {
+            text-align: center;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            appearance: textfield;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        .styled-input:focus {
+             outline: none;
+             border-color: var(--input-focus-border);
+             box-shadow: 0 0 0 2px var(--input-focus-ring);
+        }
+        .styled-input::-webkit-outer-spin-button,
+        .styled-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .styled-input[type=number] { -moz-appearance: textfield; }
+
         .time-input {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -166,17 +273,8 @@
             align-items: end;
         }
         .time-input input {
-            width: 100%;
-            text-align: center;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            appearance: textfield; /* 移除數字輸入的上下箭頭 (部分瀏覽器) */
-        }
-        .time-input input:focus {
-             outline: none;
-             border-color: #3b82f6;
-             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+             width: 100%;
+             composes: styled-input;
         }
         .time-input > div {
             display: flex;
@@ -185,208 +283,230 @@
         }
         .time-input-label {
             text-align: center;
-            font-size: 0.75rem; /* 12px */
-            line-height: 1rem; /* 16px */
-            color: #6b7280; /* gray-500 */
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: var(--text-secondary);
             margin-top: 2px;
+            transition: color 0.3s ease;
         }
-        /* 隱藏 Chrome, Safari, Edge, Opera 的數字輸入箭頭 */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-        /* 隱藏 Firefox 的數字輸入箭頭 */
-        input[type=number] {
-          -moz-appearance: textfield;
-        }
-         /* --- 結束 時間輸入 --- */
 
-         /* 設定標籤圖示 */
-         .settings-label {
+        .settings-label { display: flex; align-items: center; gap: 0.5rem; }
+        .settings-label i { color: var(--text-secondary); width: 1.1em; text-align: center; transition: color 0.3s ease; }
+        .settings-label span { color: var(--text-primary); transition: color 0.3s ease; }
+
+        #testSound { background-color: var(--bg-card-secondary); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; }
+        #testSound:hover { background-color: var(--border-primary); }
+        html.dark #testSound { background-color: var(--bg-card-secondary); color: var(--text-primary); }
+        html.dark #testSound:hover { background-color: var(--border-primary); }
+
+        select.styled-input { /* Apply base styles to select */
+             /* Adjust padding if needed */
+             padding: 0.5rem 0.75rem;
+        }
+        html.dark select option { background-color: var(--input-bg); color: var(--text-primary); }
+
+
+        #timer-block { position: relative; }
+        #timer-top-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
             display: flex;
-            align-items: center;
-            gap: 0.5rem; /* 圖示和文字間距 */
-         }
-         .settings-label i {
-             color: #6b7280; /* gray-500 */
-             width: 1.1em; /* 確保圖示寬度一致 */
-             text-align: center;
-         }
-
-         /* --- 全螢幕 --- */
-         #timer-block {
-            position: relative; /* 為了絕對定位全螢幕按鈕 */
+            gap: 0.5rem;
+            z-index: 10;
          }
          #fullscreenBtn {
-             position: absolute;
-             top: 1rem; /* p-4 */
-             right: 1rem; /* p-4 */
-             background: rgba(255, 255, 255, 0.7);
+             background: var(--fullscreen-bg);
              border-radius: 50%;
-             width: 2.5rem; /* w-10 */
-             height: 2.5rem; /* h-10 */
+             width: 2.5rem;
+             height: 2.5rem;
              display: flex;
              align-items: center;
              justify-content: center;
-             color: #374151; /* gray-700 */
-             border: 1px solid #e5e7eb; /* gray-200 */
+             color: var(--fullscreen-icon);
+             border: 1px solid var(--border-primary);
              transition: all 0.2s ease;
              cursor: pointer;
-             z-index: 10; /* 確保在其他元素之上 */
-             padding: 0; /* 移除內邊距，讓圖示置中 */
+             padding: 0;
          }
          #fullscreenBtn:hover {
-            background: rgba(243, 244, 246, 0.9); /* gray-100 */
-            color: #1f2937; /* gray-800 */
+             background: var(--fullscreen-hover-bg);
+             color: var(--darkmode-icon-hover);
          }
          #fullscreenBtn i {
-            font-size: 1.1rem;
-            line-height: 1; /* 確保圖示垂直置中 */
+             font-size: 1.1rem;
+             line-height: 1;
          }
 
-         /* 當計時器區塊處於全螢幕狀態時的樣式 */
-         #timer-block:fullscreen {
-            width: 100%;
-            height: 100%;
-            background-color: #f8fafc; /* 稍微灰白的背景 */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; /* 垂直水平居中 */
-            padding: 2rem; /* 增加一些內邊距 */
-            overflow-y: auto; /* 如果內容溢出，允許滾動 */
+        #mainDarkModeToggle {
+             position: absolute;
+             top: 1rem;
+             right: 1rem;
+             background: var(--darkmode-toggle-bg);
+             border-radius: 50%;
+             width: 2.5rem;
+             height: 2.5rem;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             color: var(--darkmode-icon);
+             border: 1px solid var(--border-primary);
+             transition: all 0.2s ease;
+             cursor: pointer;
+             padding: 0;
+             z-index: 20;
          }
-         /* 全螢幕時放大計時器 */
-         #timer-block:fullscreen .timer-circle {
-            width: 60vh; /* 使用視窗高度的百分比 */
-            height: 60vh;
-            max-width: 600px; /* 最大寬度限制 */
-            max-height: 600px; /* 最大高度限制 */
+          #mainDarkModeToggle:hover {
+             background: var(--darkmode-toggle-hover-bg);
+             color: var(--darkmode-icon-hover);
          }
-         /* 全螢幕時放大文字 */
-         #timer-block:fullscreen #timeDisplay {
-            font-size: 10vmax; /* 使用視窗最大尺寸的百分比 */
+          #mainDarkModeToggle i {
+             font-size: 1.1rem;
+             line-height: 1;
          }
-         #timer-block:fullscreen #timeDescription {
-            font-size: 2vmax; /* 相對較小的文字 */
-            margin-top: 1rem;
+
+        #timer-block:fullscreen {
+            width: 100%; height: 100%;
+            background-color: var(--bg-card);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 2rem; overflow-y: auto;
          }
-        #timer-block:fullscreen h2 {
-            font-size: 3.5vmax; /* 放大輪次標題 */
-        }
-        #timer-block:fullscreen #statusText {
-             font-size: 2.5vmax; /* 放大狀態文字 */
-             margin-bottom: 1rem; /* 增加下方間距 */
-        }
-         /* 全螢幕時放大控制按鈕 */
-        #timer-block:fullscreen .btn {
-            padding: 1rem 2rem;
-            font-size: 1.25rem;
-            border-radius: 0.75rem;
-        }
-         /* 全螢幕時確保全螢幕按鈕仍然可見且位置正確 */
-         #timer-block:fullscreen #fullscreenBtn {
-            position: fixed; /* 在全螢幕中使用固定定位 */
+        #timer-block:fullscreen .timer-circle { width: 60vh; height: 60vh; max-width: 600px; max-height: 600px; }
+        #timer-block:fullscreen #timeDisplay { font-size: 10vmax; color: var(--text-primary); }
+        #timer-block:fullscreen #timeDescription { font-size: 2vmax; margin-top: 1rem; color: var(--text-secondary); }
+        #timer-block:fullscreen h2 { font-size: 3.5vmax; color: var(--text-primary); }
+        #timer-block:fullscreen #statusText { font-size: 2.5vmax; margin-bottom: 1rem; color: var(--text-secondary); }
+        #timer-block:fullscreen .btn { padding: 1rem 2rem; font-size: 1.25rem; border-radius: 0.75rem; }
+        #timer-block:fullscreen #timer-top-controls {
+            position: fixed;
             top: 1.5rem;
             right: 1.5rem;
-            background: rgba(209, 213, 219, 0.6); /* 稍微深一點的背景 */
          }
 
-         /* 針對不同瀏覽器的全螢幕偽類 (可能不再嚴格需要，但保留以防萬一) */
-         #timer-block:-webkit-full-screen { background-color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; height: 100%; }
-         #timer-block:-moz-full-screen { background-color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; height: 100%; }
-         #timer-block:-ms-fullscreen { background-color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; height: 100%; }
+        html.dark #timer-block:fullscreen { background-color: var(--bg-primary); }
+
+        #timer-block:-webkit-full-screen { background-color: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; height: 100%; }
+        #timer-block:-moz-full-screen { background-color: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; height: 100%; }
+        #timer-block:-ms-fullscreen { background-color: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; height: 100%; }
+        html.dark #timer-block:-webkit-full-screen,
+        html.dark #timer-block:-moz-full-screen,
+        html.dark #timer-block:-ms-fullscreen { background-color: var(--bg-primary); }
+
+        h1, h2, h3, label, span, p, div { color: inherit; transition: color 0.3s ease; }
+        h1 span { color: var(--text-title); }
+        #currentRound, #timeDescription { color: var(--text-secondary); }
+        #breakIndicator { color: #f97316; }
+        html.dark #breakIndicator { color: #fb923c; }
+        #timeDisplay { color: var(--text-primary); }
+
+        .reminder-helper-text {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+        .reminder-helper-text i {
+            font-size: 0.9em;
+        }
 
     </style>
 </head>
 <body>
-    <div class="content container mx-auto px-4 py-8 max-w-5xl">
+    <div class="content container mx-auto px-4 py-8 max-w-5xl relative">
+        <button id="mainDarkModeToggle" title="切換顏色模式">
+             <i id="mainDarkModeIcon" class="fas fa-moon text-xl"></i>
+        </button>
+
         <header class="text-center mb-8">
-             <h1 class="text-4xl font-bold text-blue-800 mb-2 flex items-center justify-center">
-                 <i class="fa-solid fa-hourglass-half mr-3"></i>
+             <h1 class="text-4xl font-bold mb-2 flex items-center justify-center">
+                 <i class="fa-solid fa-hourglass-half mr-3 text-blue-600"></i>
                  <span>佇註解輪流站計時系統</span>
              </h1>
-            <p class="text-gray-600 text-lg">時間神管理，效率神提升</p>
+            <p class="text-lg" style="color: var(--text-secondary);">時間神管理，效率神提升</p>
         </header>
 
-        <div id="notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg notification z-50 max-w-md text-center">
+        <div id="notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg notification z-50 max-w-md text-center">
             <p class="font-medium text-lg"></p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- 左側：設定面板 -->
-            <div class="bg-white rounded-xl shadow-lg p-6 order-2 lg:order-1">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                     <i class="fa-solid fa-gear mr-2 text-gray-600"></i>
-                     時間設定
+            <!-- Left: Settings Panel -->
+            <div class="card rounded-xl shadow-lg p-6 order-2 lg:order-1">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                     <i class="fa-solid fa-gear mr-2" style="color: var(--text-secondary);"></i>
+                     <span>時間設定</span>
                 </h2>
 
                 <div class="mb-6">
-                    <label for="discussionMinutes" class="block text-gray-700 mb-2 font-medium settings-label">
+                    <label class="block mb-2 font-medium settings-label">
                         <i class="fa-solid fa-comments"></i>
                         <span>每輪討論時間</span>
                     </label>
                     <div class="time-input">
                         <div>
-                            <input type="number" id="discussionMinutes" value="5" min="0">
+                            <input type="number" id="discussionMinutes" value="5" min="0" class="styled-input">
                             <label for="discussionMinutes" class="time-input-label">分鐘</label>
                         </div>
                         <div>
-                            <input type="number" id="discussionSeconds" value="0" min="0" max="59">
+                            <input type="number" id="discussionSeconds" value="0" min="0" max="59" class="styled-input">
                             <label for="discussionSeconds" class="time-input-label">秒鐘</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-6">
-                    <label for="reminderMinutes" class="block text-gray-700 mb-2 font-medium settings-label">
+                    <label class="block mb-2 font-medium settings-label">
                         <i class="fa-solid fa-bell"></i>
                         <span>輪桌提醒時間</span>
                     </label>
                     <div class="time-input">
                         <div>
-                            <input type="number" id="reminderMinutes" value="0" min="0">
+                            <input type="number" id="reminderMinutes" value="0" min="0" class="styled-input">
                             <label for="reminderMinutes" class="time-input-label">分鐘</label>
                         </div>
                         <div>
-                            <input type="number" id="reminderSeconds" value="30" min="0" max="59">
+                            <input type="number" id="reminderSeconds" value="30" min="0" max="59" class="styled-input">
                             <label for="reminderSeconds" class="time-input-label">秒鐘</label>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-500 mt-1">提前多久提醒輪換桌次</p>
+                    <p class="text-sm mt-1 reminder-helper-text">
+                         <i class="fa-solid fa-circle-info"></i>
+                         <span>提前多久提醒輪換桌次</span>
+                    </p>
                 </div>
 
                 <div class="mb-6">
-                    <label for="totalRounds" class="block text-gray-700 mb-2 font-medium settings-label">
+                    <label class="block mb-2 font-medium settings-label">
                         <i class="fa-solid fa-repeat"></i>
                         <span>總輪桌次數</span>
                     </label>
-                    <div class="flex items-center">
-                        <input type="number" id="totalRounds" class="w-full px-3 py-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="3" min="1">
-                        <span class="text-gray-600">輪</span>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="totalRounds" value="3" min="1" class="styled-input w-20">
+                        <span style="color: var(--text-secondary); font-size: 0.875rem;">輪</span>
                     </div>
                 </div>
 
+
                 <div class="mb-6">
-                    <label for="breakMinutes" class="block text-gray-700 mb-2 font-medium settings-label">
+                    <label class="block mb-2 font-medium settings-label">
                         <i class="fa-solid fa-mug-saucer"></i>
                         <span>輪桌間休息時間</span>
                     </label>
                     <div class="time-input">
                         <div>
-                            <input type="number" id="breakMinutes" value="0" min="0">
+                            <input type="number" id="breakMinutes" value="0" min="0" class="styled-input">
                             <label for="breakMinutes" class="time-input-label">分鐘</label>
                         </div>
                         <div>
-                            <input type="number" id="breakSeconds" value="10" min="0" max="59">
+                            <input type="number" id="breakSeconds" value="10" min="0" max="59" class="styled-input">
                             <label for="breakSeconds" class="time-input-label">秒鐘</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-6">
-                    <div class="flex items-center justify-between text-gray-700 font-medium mb-3">
+                    <div class="flex items-center justify-between font-medium mb-3">
                         <span class="settings-label"><i class="fa-solid fa-music"></i><span>提醒鈴聲</span></span>
                         <label class="sound-switch">
                             <input type="checkbox" id="soundToggle" checked>
@@ -394,14 +514,17 @@
                         </label>
                     </div>
                     <div>
-                        <label for="soundType" class="block text-gray-600 text-sm mb-1">鈴聲類型</label>
-                        <select id="soundType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <label for="soundType" class="block text-sm mb-1 settings-label" style="color: var(--text-secondary);">
+                             <i class="fa-solid fa-sliders"></i>
+                             <span>鈴聲類型</span>
+                        </label>
+                        <select id="soundType" class="w-full styled-input"> <!-- Applied styled-input -->
                             <option value="bell">溫和鈴聲</option>
                             <option value="chime">清脆鈴聲</option>
                             <option value="alert">警示音</option>
                         </select>
                     </div>
-                    <button id="testSound" class="mt-2 w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition btn">
+                    <button id="testSound" class="mt-2 w-full py-2 px-4 rounded-lg transition btn">
                         <i class="fa-solid fa-volume-high"></i>
                         測試鈴聲
                     </button>
@@ -413,35 +536,48 @@
                 </button>
             </div>
 
-            <!-- 中間：計時器 -->
-            <!-- 加上 id="timer-block" -->
-            <div id="timer-block" class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center order-1 lg:order-2 relative">
-                 <!-- 全螢幕按鈕 -->
-                 <button id="fullscreenBtn" title="全螢幕/退出全螢幕">
-                     <i id="fullscreenIcon" class="fa-solid fa-expand"></i>
-                 </button>
+            <!-- Middle: Timer -->
+            <div id="timer-block" class="card rounded-xl shadow-lg p-6 flex flex-col items-center order-1 lg:order-2 relative">
+                 <div id="timer-top-controls">
+                    <button id="fullscreenBtn" title="全螢幕/退出全螢幕">
+                        <i id="fullscreenIcon" class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
 
-                 <h2 class="text-2xl font-bold text-center text-gray-800 mb-4 flex items-center">
-                     <i class="fa-solid fa-clock mr-2 text-gray-600"></i>
+
+                 <h2 class="text-2xl font-bold text-center mb-4 flex items-center">
+                     <i class="fa-solid fa-clock mr-2" style="color: var(--text-secondary);"></i>
                      <span id="currentRound">第 1 輪</span>
-                     <span id="breakIndicator" class="hidden text-orange-500 ml-1">（休息時間）</span>
+                     <span id="breakIndicator" class="hidden ml-1">（休息時間）</span>
                  </h2>
-                 <p id="statusText" class="text-center text-gray-600 mb-4 min-h-[24px]">準備開始</p>
+                 <p id="statusText" class="text-center mb-4 min-h-[24px]" style="color: var(--text-secondary);">準備開始</p>
 
 
                 <div class="timer-circle flex items-center justify-center mb-6">
-                    <svg width="100%" height="100%" viewbox="0 0 280 280" preserveAspectRatio="xMidYMid meet"> <!-- SVG 調整以適應縮放 -->
-                        <circle cx="140" cy="140" r="120" fill="none" stroke="#e5e7eb" stroke-width="16"></circle>
-                        <circle id="timerCircle" cx="140" cy="140" r="120" fill="none" stroke="#3b82f6" stroke-width="16" stroke-linecap="round" pathLength="100"></circle>
+                    <svg width="100%" height="100%" viewbox="0 0 280 280" preserveAspectRatio="xMidYMid meet">
+                        <!-- ****** ADDED: Gradient Definition ****** -->
+                        <defs>
+                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />    <!-- Red -->
+                              <stop offset="20%" style="stop-color:#f97316;stop-opacity:1" />   <!-- Orange -->
+                              <stop offset="40%" style="stop-color:#eab308;stop-opacity:1" />   <!-- Yellow -->
+                              <stop offset="60%" style="stop-color:#22c55e;stop-opacity:1" />   <!-- Green -->
+                              <stop offset="80%" style="stop-color:#3b82f6;stop-opacity:1" />   <!-- Blue -->
+                              <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />  <!-- Violet -->
+                            </linearGradient>
+                        </defs>
+                         <!-- ****** END GRADIENT DEFINITION ****** -->
+                        <circle id="baseCircle" cx="140" cy="140" r="120" fill="none" stroke-width="16"></circle>
+                        <circle id="timerCircle" cx="140" cy="140" r="120" fill="none" stroke-width="16" stroke-linecap="round" pathLength="100"></circle> <!-- Stroke applied via CSS -->
                     </svg>
                     <div class="absolute text-center">
-                        <div id="timeDisplay" class="text-5xl font-bold text-gray-800 tabular-nums">05:00</div>
-                        <div id="timeDescription" class="text-gray-500 mt-2">剩餘時間</div>
+                        <div id="timeDisplay" class="text-5xl font-bold tabular-nums">05:00</div>
+                        <div id="timeDescription" class="mt-2">剩餘時間</div>
                     </div>
                 </div>
 
-                <!-- 控制按鈕 -->
-                <div class="flex space-x-4 w-full mb-4 max-w-sm"> <!-- 限制最大寬度，避免全螢幕時按鈕過寬 -->
+                <!-- Control Buttons -->
+                <div class="flex space-x-4 w-full mb-4 max-w-sm">
                     <button id="startPauseBtn" class="flex-1 btn btn-primary">
                         <i id="startPauseIcon" class="fas fa-play"></i>
                         <span id="startPauseBtnText">開始</span>
@@ -452,37 +588,41 @@
                     </button>
                 </div>
 
-                <button id="skipBtn" class="w-full btn btn-secondary max-w-sm" disabled> <!-- 限制最大寬度 -->
+                <button id="skipBtn" class="w-full btn btn-secondary max-w-sm" disabled>
                     <i class="fas fa-forward-step"></i>
                     跳至下一階段
                 </button>
             </div>
 
-            <!-- 右側：輪桌狀態 -->
-            <div class="bg-white rounded-xl shadow-lg p-6 order-3">
-                 <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                     <i class="fa-solid fa-list-check mr-2 text-gray-600"></i>
-                     輪桌進度
+            <!-- Right: Round Status -->
+            <div class="card rounded-xl shadow-lg p-6 order-3">
+                 <h2 class="text-2xl font-bold mb-4 flex items-center">
+                     <i class="fa-solid fa-list-check mr-2" style="color: var(--text-secondary);"></i>
+                     <span>輪桌進度</span>
                  </h2>
 
                 <div id="roundsContainer" class="space-y-4">
-                    <!-- 輪桌卡片會在這裡動態生成 -->
+                    <!-- Round cards dynamically generated here -->
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="py-4 bg-gray-800 text-white text-center mt-8">
+    <footer class="py-4 text-center mt-8">
         <p>Copyright © Liyuchiutiger Gongminshen</p>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // --- DOM 元素 ---
-            const timerBlock = document.getElementById('timer-block'); // 新增: 計時器區塊
-            const fullscreenBtn = document.getElementById('fullscreenBtn'); // 新增: 全螢幕按鈕
-            const fullscreenIcon = document.getElementById('fullscreenIcon'); // 新增: 全螢幕圖示
+            const htmlElement = document.documentElement;
+            const mainDarkModeToggle = document.getElementById('mainDarkModeToggle');
+            const mainDarkModeIcon = document.getElementById('mainDarkModeIcon');
+            const timerBlock = document.getElementById('timer-block');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const fullscreenIcon = document.getElementById('fullscreenIcon');
             const timeDisplay = document.getElementById('timeDisplay');
+            const baseCircle = document.getElementById('baseCircle');
             const timerCircle = document.getElementById('timerCircle');
             const startPauseBtn = document.getElementById('startPauseBtn');
             const startPauseIcon = document.getElementById('startPauseIcon');
@@ -507,7 +647,7 @@
             const breakMinutesInput = document.getElementById('breakMinutes');
             const breakSecondsInput = document.getElementById('breakSeconds');
 
-            // --- 計時器狀態 ---
+            // --- Timer State ---
             let animationFrameId = null;
             let isRunning = false;
             let isPaused = false;
@@ -521,7 +661,7 @@
             let notificationTimeout = null;
             let lastDisplayedSeconds = -1;
 
-            // --- 設定值 ---
+            // --- Settings ---
             let discussionMinutes = 5;
             let discussionSeconds = 0;
             let reminderMinutes = 0;
@@ -533,437 +673,436 @@
             // --- Web Audio API ---
             let audioContext = null;
 
+            // --- Dark Mode ---
+            function applyTheme(theme) {
+                const isDark = theme === 'dark';
+                htmlElement.classList.toggle('dark', isDark);
+                const iconClassAdd = isDark ? 'fa-sun' : 'fa-moon';
+                const iconClassRemove = isDark ? 'fa-moon' : 'fa-sun';
+                mainDarkModeIcon.classList.add(iconClassAdd);
+                mainDarkModeIcon.classList.remove(iconClassRemove);
+                const title = isDark ? "切換亮色模式" : "切換暗色模式";
+                mainDarkModeToggle.title = title;
+            }
+
+            function toggleDarkMode() {
+                const currentTheme = htmlElement.classList.contains('dark') ? 'dark' : 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            }
+
+            function initializeTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                let currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+                applyTheme(currentTheme);
+            }
+
+            // --- Audio Functions ---
             function initAudio() {
                 try {
-                    // 嘗試建立 AudioContext
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    // 如果初始狀態是 suspended，提示使用者可能需要互動
                     if (audioContext.state === 'suspended') {
-                        console.warn("AudioContext is suspended. User interaction might be required to enable sound.");
+                        console.warn("AudioContext is suspended. User interaction required.");
                     }
                 } catch (e) {
-                    console.error('Web Audio API is not supported in this browser.');
-                    // 停用聲音相關控制項
+                    console.error('Web Audio API is not supported.', e);
                     soundToggle.disabled = true;
                     testSound.disabled = true;
                     soundType.disabled = true;
-                    // 可以顯示一個提示訊息給使用者
                     const soundErrorMsg = document.createElement('p');
                     soundErrorMsg.textContent = '您的瀏覽器不支援音效播放。';
                     soundErrorMsg.className = 'text-xs text-red-500 mt-1';
+                    if (htmlElement.classList.contains('dark')) {
+                        soundErrorMsg.style.color = '#f87171';
+                    }
                     testSound.parentNode.insertBefore(soundErrorMsg, testSound.nextSibling);
                 }
             }
 
-
-            function playSound(type = 'bell', isReminder = false) {
-                // 檢查 AudioContext 是否存在以及聲音是否啟用
+             function playSound(type = 'bell', isReminder = false) {
                 if (!audioContext || !soundToggle.checked) return;
-                // 嘗試恢復被暫停的 AudioContext (通常在使用者首次互動後需要)
                 if (audioContext.state === 'suspended') {
                     audioContext.resume().catch(err => console.error("AudioContext resume failed:", err));
-                    // 注意：resume() 是異步的，第一次播放可能還是會失敗，但後續應該會成功
+                }
+                if (audioContext.state !== 'running') {
+                    console.warn("AudioContext not running, sound playback aborted.");
+                    return;
                 }
 
-                // 定義音頻參數
-                const freq1 = isReminder ? 660 : 880; // 提醒音高較高 (E5 : A5) | 一般音 (A4 : C5#)
-                const freq2 = isReminder ? 880 : 1046.50;// 提醒音高較高 (A5 : C6) | 一般音 (C5 : D5)
-                const duration = isReminder ? 0.8 : 1.5; // 提醒音較短
-                const gainValue = isReminder ? 0.15 : 0.3; // 提醒音較小聲
-                let oscType = 'sine'; // 預設: 溫和鈴聲
+                const freq1 = isReminder ? 660 : 880;
+                const freq2 = isReminder ? 880 : 1046.50;
+                const duration = isReminder ? 0.8 : 1.5;
+                const gainValue = isReminder ? 0.15 : 0.3;
+                let oscType = 'sine';
                 switch (type) {
-                    case 'chime': oscType = 'triangle'; break; // 清脆鈴聲
-                    case 'alert': oscType = 'sawtooth'; break; // 警示音
+                    case 'chime': oscType = 'triangle'; break;
+                    case 'alert': oscType = 'sawtooth'; break;
                 }
-                const now = audioContext.currentTime; // 取得目前 AudioContext 的時間
+                const now = audioContext.currentTime;
 
-                // 第一個音調
-                const osc1 = audioContext.createOscillator(); // 建立振盪器
-                const gain1 = audioContext.createGain(); // 建立音量控制器
-                osc1.connect(gain1); // 振盪器連接到音量控制器
-                gain1.connect(audioContext.destination); // 音量控制器連接到輸出裝置 (喇叭)
-                osc1.type = oscType; // 設定波形
-                osc1.frequency.setValueAtTime(freq1, now); // 設定頻率
-                gain1.gain.setValueAtTime(0, now); // 開始時音量為 0
-                gain1.gain.linearRampToValueAtTime(gainValue, now + 0.05); // 快速淡入到目標音量
-                gain1.gain.exponentialRampToValueAtTime(0.001, now + duration); // 指數淡出到接近無聲
-                osc1.start(now); // 開始播放
-                osc1.stop(now + duration); // 在指定時間後停止
+                try {
+                    const osc1 = audioContext.createOscillator();
+                    const gain1 = audioContext.createGain();
+                    osc1.connect(gain1);
+                    gain1.connect(audioContext.destination);
+                    osc1.type = oscType;
+                    osc1.frequency.setValueAtTime(freq1, now);
+                    gain1.gain.setValueAtTime(0, now);
+                    gain1.gain.linearRampToValueAtTime(gainValue, now + 0.05);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                    osc1.start(now);
+                    osc1.stop(now + duration);
 
-                // 第二個音調 (稍微延遲) - 警示提醒音除外
-                if (!isReminder || type !== 'alert') {
-                     setTimeout(() => {
-                        // 再次檢查 AudioContext 是否存在 (以防萬一)
-                        if (!audioContext) return;
-                        const now2 = audioContext.currentTime;
-                        const osc2 = audioContext.createOscillator();
-                        const gain2 = audioContext.createGain();
-                        osc2.connect(gain2);
-                        gain2.connect(audioContext.destination);
-                        osc2.type = oscType;
-                        osc2.frequency.setValueAtTime(freq2, now2);
-                        gain2.gain.setValueAtTime(0, now2);
-                        gain2.gain.linearRampToValueAtTime(gainValue, now2 + 0.05);
-                        gain2.gain.exponentialRampToValueAtTime(0.001, now2 + duration);
-                        osc2.start(now2);
-                        osc2.stop(now2 + duration);
-                    }, isReminder ? 250 : 400); // 提醒音的延遲較短
+                    if (!isReminder || type !== 'alert') {
+                         setTimeout(() => {
+                            if (!audioContext || audioContext.state !== 'running') return;
+                            const now2 = audioContext.currentTime;
+                            const osc2 = audioContext.createOscillator();
+                            const gain2 = audioContext.createGain();
+                            osc2.connect(gain2);
+                            gain2.connect(audioContext.destination);
+                            osc2.type = oscType;
+                            osc2.frequency.setValueAtTime(freq2, now2);
+                            gain2.gain.setValueAtTime(0, now2);
+                            gain2.gain.linearRampToValueAtTime(gainValue, now2 + 0.05);
+                            gain2.gain.exponentialRampToValueAtTime(0.001, now2 + duration);
+                            osc2.start(now2);
+                            osc2.stop(now2 + duration);
+                        }, isReminder ? 250 : 400);
+                    }
+                } catch (error) {
+                    console.error("Error playing sound:", error);
                 }
             }
 
-             // --- UI 更新函數 ---
-
-             function initializeRoundCards() {
-                roundsContainer.innerHTML = ''; // 清除現有的卡片
+            // --- UI Update Functions ---
+            function initializeRoundCards() {
+                roundsContainer.innerHTML = '';
                 for (let i = 1; i <= totalRounds; i++) {
-                    // 討論卡片
                     const card = document.createElement('div');
                     card.id = `round-${i}`;
-                    card.className = 'table-card p-4 border rounded-lg bg-gray-50 border-gray-200';
+                    card.className = 'table-card p-4 border rounded-lg';
                     const discussionTimeText = formatSettingsTime(discussionMinutes, discussionSeconds);
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
                             <div>
                                 <h3 class="font-medium text-lg">第 ${i} 輪討論</h3>
-                                <p class="text-gray-500 text-sm">${discussionTimeText || '0 秒'}</p>
+                                <p class="text-sm">${discussionTimeText || '0 秒'}</p>
                             </div>
-                            <div class="status-indicator w-3 h-3 rounded-full bg-gray-300 shrink-0 ml-2"></div>
+                            <div class="status-indicator w-3 h-3 rounded-full shrink-0 ml-2"></div>
                         </div>`;
-                    card.addEventListener('click', handleCardClick); // 加上點擊事件
+                    card.addEventListener('click', handleCardClick);
                     roundsContainer.appendChild(card);
 
-                    // 休息卡片 (如果需要)
                     const breakTimeTotal = breakMinutes * 60 + breakSeconds;
-                    if (breakTimeTotal > 0 && i < totalRounds) { // 只在輪次之間且有休息時間才加入
+                    if (breakTimeTotal > 0 && i < totalRounds) {
                         const breakCard = document.createElement('div');
-                        breakCard.id = `break-${i}`; // ID 表示第 i 輪 *之後* 的休息
-                        breakCard.className = 'table-card p-4 border rounded-lg bg-gray-50 border-gray-200';
+                        breakCard.id = `break-${i}`;
+                        breakCard.className = 'table-card p-4 border rounded-lg';
                         const breakTimeText = formatSettingsTime(breakMinutes, breakSeconds);
                         breakCard.innerHTML = `
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <h3 class="font-medium text-lg text-orange-600">休息時間</h3>
-                                    <p class="text-gray-500 text-sm">${breakTimeText || '0 秒'}</p>
+                                    <h3 class="font-medium text-lg">休息時間</h3>
+                                    <p class="text-sm">${breakTimeText || '0 秒'}</p>
                                 </div>
-                                <div class="status-indicator w-3 h-3 rounded-full bg-gray-300 shrink-0 ml-2"></div>
+                                <div class="status-indicator w-3 h-3 rounded-full shrink-0 ml-2"></div>
                             </div>`;
-                        breakCard.addEventListener('click', handleCardClick); // 加上點擊事件
+                        breakCard.addEventListener('click', handleCardClick);
                         roundsContainer.appendChild(breakCard);
                     }
                 }
-                updateRoundCards(); // 設定初始狀態
+                updateRoundCards();
             }
 
             function updateRoundCards() {
-                // 先重置所有卡片樣式
+                // Reset all cards visually first
                 document.querySelectorAll('.table-card').forEach(card => {
-                    card.classList.remove('bg-blue-50', 'border-blue-300', 'bg-orange-50', 'border-orange-300', 'bg-green-50', 'border-green-300');
-                    card.classList.add('bg-gray-50', 'border-gray-200');
+                    card.classList.remove('active-round', 'active-break', 'completed', 'animate-pulse');
+                    card.style.cursor = 'pointer'; // Assume clickable initially
                     const indicator = card.querySelector('.status-indicator');
-                    indicator.classList.remove('bg-blue-500', 'bg-orange-500', 'bg-green-500', 'animate-pulse');
-                    indicator.classList.add('bg-gray-300');
+                    if (indicator) indicator.classList.remove('animate-pulse');
                 });
 
-                // 標記已完成的輪次和休息
-                const completedUpToRound = isBreak ? currentRoundNumber : currentRoundNumber - 1;
-                for (let i = 1; i <= completedUpToRound; i++) {
-                    const completedRoundCard = document.getElementById(`round-${i}`);
-                    if (completedRoundCard) markCardCompleted(completedRoundCard);
-                    // 標記已完成的休息時間 (在已完成輪次之間，或在最後完成輪次之後且計時結束時)
-                    if (i < completedUpToRound || (i === completedUpToRound && !isBreak && currentRoundNumber > totalRounds) ) {
-                        const completedBreakCard = document.getElementById(`break-${i}`);
-                        if (completedBreakCard) markCardCompleted(completedBreakCard);
+                // Mark stages *before* the current one as completed
+                for (let i = 1; i < currentRoundNumber; i++) {
+                    markCardCompleted(document.getElementById(`round-${i}`));
+                    if (i < totalRounds) {
+                         markCardCompleted(document.getElementById(`break-${i}`));
                     }
                 }
-
-                 // 如果流程已結束，確保最後一輪和它之前的休息也被標記完成
-                 const isFinished = currentRoundNumber > totalRounds && !isBreak;
-                 if (isFinished) {
-                     const finalRoundCard = document.getElementById(`round-${totalRounds}`);
-                     if (finalRoundCard) markCardCompleted(finalRoundCard);
-                     const finalBreakCard = document.getElementById(`break-${totalRounds - 1}`); // 最後一輪之前的休息
-                     if (finalBreakCard) markCardCompleted(finalBreakCard);
+                 // If current stage is a discussion, mark the break *before* it (if any) as completed
+                 if (!isBreak && currentRoundNumber > 1) {
+                     markCardCompleted(document.getElementById(`break-${currentRoundNumber - 1}`));
+                 }
+                // If current stage is a break, mark the round *before* it as completed
+                 if (isBreak) { // currentRoundNumber refers to the round *before* the break
+                      markCardCompleted(document.getElementById(`round-${currentRoundNumber}`));
                  }
 
-                // 高亮目前階段 (如果未結束且正在運行或暫停)
-                 if (!isFinished && (isRunning || isPaused)) {
+
+                // Highlight the current stage (unless the whole process is finished)
+                const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                if (!isFinished && (isRunning || isPaused)) {
                     const currentCardId = isBreak ? `break-${currentRoundNumber}` : `round-${currentRoundNumber}`;
                     const currentCard = document.getElementById(currentCardId);
-                    if (currentCard) {
-                        currentCard.classList.remove('bg-gray-50', 'border-gray-200');
-                        const indicator = currentCard.querySelector('.status-indicator');
-                        indicator.classList.remove('bg-gray-300');
-                        indicator.classList.add('animate-pulse'); // 目前階段加上閃爍效果
-
-                        if (isBreak) { // 休息時間
-                            currentCard.classList.add('bg-orange-50', 'border-orange-300');
-                            indicator.classList.add('bg-orange-500');
-                        } else { // 討論時間
-                            currentCard.classList.add('bg-blue-50', 'border-blue-300');
-                            indicator.classList.add('bg-blue-500');
+                    if (currentCard) { // currentCard should exist and not be marked completed yet
+                        currentCard.classList.remove('completed'); // Ensure it's not styled as completed
+                        currentCard.classList.add(isBreak ? 'active-break' : 'active-round');
+                        currentCard.style.cursor = 'default'; // Current card isn't clickable to jump to itself
+                        if (isRunning) {
+                            currentCard.classList.add('animate-pulse');
+                            const indicator = currentCard.querySelector('.status-indicator');
+                            if (indicator) indicator.classList.add('animate-pulse');
                         }
                     }
+                } else if (isFinished) {
+                     // Ensure final round and preceding break (if any) are marked completed
+                      markCardCompleted(document.getElementById(`round-${totalRounds}`));
+                      if (totalRounds > 1) {
+                          markCardCompleted(document.getElementById(`break-${totalRounds - 1}`));
+                      }
                 }
+
+                 // After logic, ensure all truly completed cards have 'not-allowed' cursor
+                 document.querySelectorAll('.table-card.completed').forEach(card => {
+                    card.style.cursor = 'not-allowed';
+                 });
             }
 
+
             function markCardCompleted(cardElement) {
-                 if (!cardElement) return; // 檢查元素是否存在
-                 cardElement.classList.remove('bg-blue-50', 'border-blue-300', 'bg-orange-50', 'border-orange-300', 'bg-gray-50', 'border-gray-200');
-                 cardElement.classList.add('bg-green-50', 'border-green-300'); // 完成狀態的樣式
+                 if (!cardElement) return;
+                 cardElement.classList.remove('active-round', 'active-break', 'animate-pulse');
+                 cardElement.classList.add('completed');
+                 cardElement.style.cursor = 'not-allowed'; // Set cursor explicitly when marking complete
                  const indicator = cardElement.querySelector('.status-indicator');
-                 indicator.classList.remove('bg-blue-500', 'bg-orange-500', 'bg-gray-300', 'animate-pulse');
-                 indicator.classList.add('bg-green-500'); // 完成狀態的指示燈顏色
+                  if (indicator) indicator.classList.remove('animate-pulse');
             }
 
             function formatSettingsTime(minutes, seconds) {
                 let parts = [];
                 if (minutes > 0) parts.push(`${minutes} 分鐘`);
                 if (seconds > 0) parts.push(`${seconds} 秒`);
-                return parts.join(' ') || null; // 如果都是 0，返回 null
+                return parts.join(' ') || null;
             }
 
             function formatTimerDisplay(seconds) {
-                const displaySeconds = Math.max(0, Math.ceil(seconds)); // 確保顯示 00:00，向上取整顯示
+                const displaySeconds = Math.max(0, Math.ceil(seconds));
                 const mins = Math.floor(displaySeconds / 60);
                 const secs = displaySeconds % 60;
                 return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
 
+            // ****** MODIFIED: updateTimerVisuals - Removed color logic ******
             function updateTimerVisuals(preciseTimeRemaining) {
                 const displaySeconds = Math.max(0, preciseTimeRemaining);
 
-                // --- 更新文字顯示 (僅當整秒數變化時) ---
+                // Update text display only when the whole second changes
                 const currentWholeSeconds = Math.ceil(displaySeconds);
                 if (currentWholeSeconds !== lastDisplayedSeconds) {
                      timeDisplay.textContent = formatTimerDisplay(displaySeconds);
                      lastDisplayedSeconds = currentWholeSeconds;
-
-                      // 更新頁面標題
+                      // Update page title
                       let titleStage = isBreak ? `休息 (${currentRoundNumber}/${totalRounds})` : `第 ${currentRoundNumber} 輪`;
                       const isFinished = currentRoundNumber > totalRounds && !isBreak;
                       if (isFinished) titleStage = "已完成";
                       document.title = `${formatTimerDisplay(displaySeconds)} - ${titleStage} | 輪流站計時`;
                 }
 
-                // --- 更新圓圈進度 ---
+                // Update circle progress (stroke-dashoffset)
                 const percentage = stageDuration > 0 ? ((stageDuration - displaySeconds) / stageDuration) * 100 : 0;
                 const clampedPercentage = Math.max(0, Math.min(100, percentage));
-                // strokeDashoffset 初始為 100 (空)，趨近於 0 (滿)
                 timerCircle.style.strokeDashoffset = 100 - clampedPercentage;
 
-                // --- 更新圓圈顏色 ---
-                let circleColor = '#3b82f6'; // 預設藍色
-                if (isBreak) {
-                    circleColor = '#f97316'; // 休息時橘色
-                } else if (!reminderShown && reminderTime > 0 && displaySeconds <= reminderTime) {
-                     circleColor = '#f59e0b'; // 提醒時段黃/琥珀色
-                } else if (stageDuration > 0 && displaySeconds / stageDuration < 0.15) { // 最後 15% 時間
-                    circleColor = '#ef4444'; // 低時間紅色
-                }
-                 // 僅當顏色變化時才應用，避免不必要的樣式更新
-                 if (timerCircle.style.stroke !== circleColor) {
-                    timerCircle.style.stroke = circleColor;
-                 }
+                // Color logic is removed as the gradient is static SVG
             }
+             // ****** END MODIFICATION ******
 
              function updateButtonStates() {
                  const isFinished = currentRoundNumber > totalRounds && !isBreak;
-                 // 重置按鈕可用條件：正在運行、暫停、已完成、或在第一輪開始前、或在休息中
                  const canReset = isRunning || isPaused || isFinished || (currentRoundNumber === 1 && !isBreak && !isRunning && !isPaused) || (isBreak && !isRunning && !isPaused);
-                 // 跳過按鈕可用條件：正在運行或暫停，且未完成
+                 // Skip button logic remains the same
                  const canSkip = (isRunning || isPaused) && !isFinished;
 
                  resetBtn.disabled = !canReset;
                  skipBtn.disabled = !canSkip;
 
-                 // 更新 開始/暫停/繼續/重啟 按鈕
-                 startPauseBtn.disabled = false; // 通常是可用的
-                 startPauseBtn.classList.remove('btn-primary', 'btn-outline-pause'); // 重置樣式
+                 startPauseBtn.disabled = false;
+                 startPauseBtn.classList.remove('btn-primary', 'btn-outline-pause');
 
                  if (isFinished) {
                      startPauseBtnText.textContent = '重新開始';
-                     startPauseIcon.className = 'fas fa-rotate-right'; // 重啟圖示
-                     startPauseBtn.classList.add('btn-primary'); // 主要樣式
+                     startPauseIcon.className = 'fas fa-rotate-right';
+                     startPauseBtn.classList.add('btn-primary');
                  } else if (isRunning && !isPaused) {
                      startPauseBtnText.textContent = '暫停';
-                     startPauseIcon.className = 'fas fa-pause'; // 暫停圖示
-                     startPauseBtn.classList.add('btn-outline-pause'); // 外框樣式表示可點擊暫停
+                     startPauseIcon.className = 'fas fa-pause';
+                     startPauseBtn.classList.add('btn-outline-pause');
                  } else if (isPaused) {
                      startPauseBtnText.textContent = '繼續';
-                     startPauseIcon.className = 'fas fa-play'; // 播放圖示
-                     startPauseBtn.classList.add('btn-primary'); // 主要樣式
-                 } else { // 初始狀態或準備開始下一輪
+                     startPauseIcon.className = 'fas fa-play';
+                     startPauseBtn.classList.add('btn-primary');
+                 } else { // Ready to start
                      startPauseBtnText.textContent = '開始';
-                     startPauseIcon.className = 'fas fa-play'; // 播放圖示
-                     startPauseBtn.classList.add('btn-primary'); // 主要樣式
+                     startPauseIcon.className = 'fas fa-play';
+                     startPauseBtn.classList.add('btn-primary');
                  }
             }
 
             function showNotification(message, type = 'info') {
-                if (notificationTimeout) clearTimeout(notificationTimeout); // 清除之前的計時器
+                if (notificationTimeout) clearTimeout(notificationTimeout);
 
-                notificationText.textContent = message; // 設定訊息文字
-                // 清除之前的背景顏色和隱藏類
+                notificationText.textContent = message;
                 notification.classList.remove('hidden', 'bg-blue-600', 'bg-orange-500', 'bg-green-600');
 
-                let bgColor = 'bg-blue-600'; // 預設背景色
-                let shouldPlaySound = false; // 是否播放聲音
-                let isReminderSound = false; // 是否是提醒音效
+                let bgColor = 'bg-blue-600';
+                let shouldPlaySound = false;
+                let isReminderSound = false;
 
-                // 根據類型設定背景色和聲音
                 if (type === 'warning') {
-                     bgColor = 'bg-orange-500'; // 警告用橘色
+                     bgColor = 'bg-orange-500';
                      shouldPlaySound = true;
                      isReminderSound = true;
                 } else if (type === 'success') {
-                     bgColor = 'bg-green-600'; // 成功用綠色
+                     bgColor = 'bg-green-600';
                      shouldPlaySound = true;
                 } else {
-                    // 針對關鍵狀態轉換播放聲音
                     if (message.includes('開始') || message.includes('結束') || message.includes('輪討論') || message.includes('跳轉') || message.includes('重新開始') || message.includes('完成') || message.includes('休息時間')) {
                          shouldPlaySound = true;
                     }
                 }
 
-                // 播放聲音
                 if(shouldPlaySound) {
-                    playSound(soundType.value, isReminderSound);
+                    if (audioContext && audioContext.state === 'suspended') {
+                        audioContext.resume().then(() => {
+                             playSound(soundType.value, isReminderSound);
+                        }).catch(err => console.error("Notification sound resume failed:", err));
+                    } else if (audioContext && audioContext.state === 'running') {
+                         playSound(soundType.value, isReminderSound);
+                    }
                 }
 
-                // 應用背景色並顯示通知
                 notification.classList.add(bgColor);
-                // --- 強制重繪以觸發動畫 ---
                 notification.style.animation = 'none';
-                requestAnimationFrame(() => {
-                    notification.style.animation = ''; // 重新應用動畫定義
-                    notification.classList.add('notification'); // 添加動畫類
-                });
-                // --- 結束強制重繪 ---
+                void notification.offsetWidth;
+                notification.style.animation = '';
+                notification.classList.add('notification');
 
-                 // 設定延遲自動隱藏
                  notificationTimeout = setTimeout(() => {
                     notification.classList.add('hidden');
-                    notificationTimeout = null; // 清除超時 ID
-                }, 5000); // 顯示 5 秒
+                    notificationTimeout = null;
+                }, 5000);
             }
 
-            // --- 核心計時器邏輯 ---
+            // --- Core Timer Logic ---
 
             function proceedToNextStage() {
-                 console.log(`準備從階段: 第 ${currentRoundNumber} 輪, 是否休息: ${isBreak} 轉換`);
-                 // 先標記目前階段完成
+                 console.log(`Proceeding from: Round ${currentRoundNumber}, Is Break: ${isBreak}`);
                  const currentCardId = isBreak ? `break-${currentRoundNumber}` : `round-${currentRoundNumber}`;
-                 const currentCard = document.getElementById(currentCardId);
-                 if(currentCard) markCardCompleted(currentCard);
+                 markCardCompleted(document.getElementById(currentCardId));
 
-                 if (isBreak) { // 目前在休息中
-                    isBreak = false; // 結束休息
-                    currentRoundNumber++; // 進入下一輪
+                 if (isBreak) {
+                    isBreak = false;
+                    currentRoundNumber++;
                     if (currentRoundNumber > totalRounds) {
-                        // 完成了最後一輪之後的休息
                         showNotification('所有輪桌討論已結束！', 'success');
-                        resetTimer(true); // 重置到完成狀態
-                        console.log("流程結束 (完成最後休息).");
-                        return false; // 不能繼續
+                        resetTimer(true);
+                        console.log("Process ended (after final break).");
+                        return false;
                     } else {
-                        // 準備進入下一輪討論
                         showNotification(`第 ${currentRoundNumber} 輪討論即將開始！`);
                         breakIndicator.classList.add('hidden');
                         currentRound.textContent = `第 ${currentRoundNumber} 輪`;
                     }
-                } else { // 目前在討論中
+                } else {
                      const hasBreakTime = breakMinutes * 60 + breakSeconds > 0;
-                     if (hasBreakTime && currentRoundNumber < totalRounds) { // 如果有休息時間且不是最後一輪
-                        // 進入第 currentRoundNumber 輪之後的休息
+                     if (hasBreakTime && currentRoundNumber < totalRounds) {
                         isBreak = true;
                         showNotification('休息時間即將開始！');
                         breakIndicator.classList.remove('hidden');
-                        // currentRoundNumber 保持不變，因為是第 X 輪 *之後* 的休息
                     } else {
-                         // 沒有休息時間，或這是最後一輪，直接進入下一輪狀態
-                         isBreak = false; // 確保不是休息狀態
-                         currentRoundNumber++; // 輪次增加
+                         isBreak = false;
+                         currentRoundNumber++;
                          if (currentRoundNumber > totalRounds) {
-                             // 完成了最後一輪討論
                              showNotification('所有輪桌討論已結束！', 'success');
-                             resetTimer(true); // 重置到完成狀態
-                             console.log("流程結束 (完成最後討論，無後續休息或跳過).");
-                             return false; // 不能繼續
+                             resetTimer(true);
+                             console.log("Process ended (after final round, no break).");
+                             return false;
                          } else {
-                            // 準備進入下一輪討論 (跳過了中間的休息)
                             showNotification(`第 ${currentRoundNumber} 輪討論即將開始！`);
                             breakIndicator.classList.add('hidden');
                             currentRound.textContent = `第 ${currentRoundNumber} 輪`;
                          }
                     }
                 }
-                console.log(`轉換到狀態: 第 ${currentRoundNumber} 輪, 是否休息: ${isBreak}`);
-                return true; // 可以繼續到下個階段
+                console.log(`Transitioned to: Round ${currentRoundNumber}, Is Break: ${isBreak}`);
+                return true;
             }
 
-             function timerLoop(timestamp) {
-                 // 如果未運行或已暫停，則停止循環
+            function timerLoop(timestamp) {
                  if (!isRunning || isPaused) return;
+                 if (stageStartTime === 0) stageStartTime = timestamp;
 
-                 // 計算自階段開始以來經過的秒數
-                 const elapsedSeconds = (timestamp - stageStartTime) / 1000;
-                 // 計算精確的剩餘時間
-                 let preciseTimeRemaining = stageDuration - elapsedSeconds;
+                 const elapsedMs = timestamp - stageStartTime;
+                 const elapsedSeconds = elapsedMs / 1000;
+                 let preciseTimeRemaining = Math.max(0, stageDuration - elapsedSeconds);
 
-                 // 更新視覺元素 (時間顯示、進度條)
                  updateTimerVisuals(preciseTimeRemaining);
 
-                 // 檢查提醒 (僅在討論階段、提醒未顯示過、且設定了提醒時間)
                  if (!isBreak && !reminderShown && reminderTime > 0 && preciseTimeRemaining <= reminderTime) {
                      const reminderTimeText = formatSettingsTime(reminderMinutes, reminderSeconds);
                      showNotification(`剩下 ${reminderTimeText}，請準備輪換！`, 'warning');
-                     reminderShown = true; // 標記提醒已顯示
-                     timerCircle.style.stroke = '#f59e0b'; // 立即更新顏色為提醒色
+                     reminderShown = true;
+                     // Maybe add a visual pulse/glow effect here instead of color change?
+                     // e.g., timerCircle.classList.add('reminder-pulse');
+                 } else if (preciseTimeRemaining > reminderTime) {
+                     // Remove reminder effect if time goes back up (e.g., after jumping)
+                     // e.g., timerCircle.classList.remove('reminder-pulse');
                  }
 
-                 // --- 時間到檢查 ---
-                 if (preciseTimeRemaining <= 0) {
-                     console.log("目前階段時間到。");
-                     isRunning = false; // 停止運行標誌
+
+                 if (preciseTimeRemaining < 0.05) { // Time's up
+                     console.log("Stage time ended.");
+                     isRunning = false;
                      if (animationFrameId) {
-                        cancelAnimationFrame(animationFrameId); // 停止動畫幀循環
+                        cancelAnimationFrame(animationFrameId);
                         animationFrameId = null;
                      }
+                     stageStartTime = 0;
+                     // timerCircle.classList.remove('reminder-pulse'); // Clear reminder effect
 
-                     // 確保最後顯示 00:00 且進度條滿
                      updateTimerVisuals(0);
+                     playSound(soundType.value);
 
-                     // 嘗試轉換到下一個階段的狀態
                      const canContinue = proceedToNextStage();
 
-                     if (canContinue) { // 如果還有下一階段
-                         console.log("準備自動開始下一階段...");
-                         // 延遲後自動開始下一階段
+                     if (canContinue) {
+                         console.log("Preparing auto-start for next stage...");
                          setTimeout(() => {
-                             console.log("自動開始下一階段。");
-                             // 再次檢查計時器是否在延遲期間被暫停或重置
+                             console.log("Attempting auto-start...");
                              const isFinishedCheck = currentRoundNumber > totalRounds && !isBreak;
-                             if (!isPaused && !isFinishedCheck) { // 如果沒有被暫停且流程未結束
-                                 startTimer(); // 開始由 proceedToNextStage 準備好的新階段
+                             if (!isPaused && !isFinishedCheck && !isRunning) {
+                                 console.log("Auto-starting next stage.");
+                                 startTimer();
                              } else {
-                                 console.log("計時器在轉換期間被暫停或重置，取消自動開始。")
-                                 // 如果被暫停，更新 UI 反映準備狀態
+                                 console.log("Timer state changed during transition, auto-start cancelled.");
                                  if(isPaused) {
                                     stageDuration = isBreak ? (breakMinutes * 60 + breakSeconds) : (discussionMinutes * 60 + discussionSeconds);
-                                    updateTimerVisuals(stageDuration); // 顯示下一階段的總時間
+                                    updateTimerVisuals(stageDuration);
                                     statusText.textContent = `準備開始 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`} (已暫停)`;
-                                    updateButtonStates(); // 按鈕顯示 "繼續"
+                                    updateButtonStates();
+                                    updateRoundCards();
                                  }
-                                 // 如果被重置, resetTimer 已經處理了 UI 更新
                              }
-                         }, 1500); // 延遲 1.5 秒，給使用者看通知的時間
-                     } else { // 如果 proceedToNextStage 返回 false，表示流程已結束
-                         console.log("流程已到達終點。");
+                         }, 1500);
+                     } else {
+                         console.log("Process has reached the end.");
                          document.title = '輪流站計時系統 - 已完成';
-                         // resetTimer(true) 在 proceedToNextStage 中被呼叫，已更新按鈕狀態
                      }
-                 } else { // 時間還沒到
-                     // 請求下一幀動畫
+                 } else {
                      animationFrameId = requestAnimationFrame(timerLoop);
                  }
              }
@@ -971,261 +1110,257 @@
 
             function startTimer() {
                  const isFinished = currentRoundNumber > totalRounds && !isBreak;
-                 // 如果已完成，點擊 "重新開始"
                  if (isFinished) {
-                     console.log("在完成狀態下重新開始。");
-                     resetTimer(false); // 完全重置到初始狀態
-                      // 重置後需要再次啟動第一輪
-                      setTimeout(startTimer, 50); // 短暫延遲後啟動第一輪
+                     console.log("Restarting from finished state.");
+                     resetTimer(false);
+                      setTimeout(startTimer, 50);
                      return;
                  }
 
-                 // 安全檢查：如果正在運行，則不執行 (理論上 toggle 邏輯會避免)
                  if (isRunning) {
-                     console.warn("計時器已在運行中。");
+                     console.warn("Timer already running.");
                      return;
                  }
 
-                 // 從暫停狀態恢復
                  if (isPaused) {
-                     console.log("從暫停狀態恢復。");
+                     console.log("Resuming from paused state.");
                      isPaused = false;
                      isRunning = true;
-                     const pauseDurationMs = performance.now() - timePaused; // 計算暫停了多久
-                     stageStartTime += pauseDurationMs; // 將開始時間向後推移，以補償暫停時間
-                     statusText.textContent = isBreak ? '休息時間' : '討論進行中'; // 恢復狀態文字
-                     updateButtonStates(); // 更新按鈕為 "暫停"
-                     updateRoundCards(); // 恢復目前卡片的高亮和脈動
-                     animationFrameId = requestAnimationFrame(timerLoop); // 重新啟動動畫循環
+                     const pauseDurationMs = performance.now() - timePaused;
+                     stageStartTime += pauseDurationMs;
+                     statusText.textContent = isBreak ? '休息時間' : '討論進行中';
+                     updateButtonStates();
+                     updateRoundCards();
+                     animationFrameId = requestAnimationFrame(timerLoop);
                      return;
                  }
 
-                 // 開始一個新階段 (首次啟動或自動轉換)
-                 console.log(`開始新階段: 第 ${currentRoundNumber} 輪, 是否休息: ${isBreak}`);
+                 console.log(`Starting new stage: Round ${currentRoundNumber}, Is Break: ${isBreak}`);
 
-                 // 設定目前階段的持續時間和提醒時間
                  if (isBreak) {
                      stageDuration = breakMinutes * 60 + breakSeconds;
-                     reminderTime = 0; // 休息時無提醒
+                     reminderTime = 0;
                  } else {
                      stageDuration = discussionMinutes * 60 + discussionSeconds;
                      reminderTime = reminderMinutes * 60 + reminderSeconds;
                  }
 
-                 // 處理持續時間為 0 的階段 - 自動跳過
                  if (stageDuration <= 0) {
-                     console.warn(`嘗試開始時間為 ${stageDuration} 秒的階段。自動跳過。`);
+                     console.warn(`Stage duration is ${stageDuration}s. Skipping.`);
                      showNotification(`時間設為 0，跳過 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`}`, 'warning');
-                     updateTimerVisuals(0); // 短暫顯示 00:00
-                     // 直接處理並準備 *下一個* 階段
+                     updateTimerVisuals(0);
+                      const zeroCardId = isBreak ? `break-${currentRoundNumber}` : `round-${currentRoundNumber}`;
+                      markCardCompleted(document.getElementById(zeroCardId));
                      const canContinue = proceedToNextStage();
                      if (canContinue) {
-                          // 安排 *下一個* 階段的自動開始
+                         stageDuration = isBreak ? (breakMinutes * 60 + breakSeconds) : (discussionMinutes * 60 + discussionSeconds);
+                         statusText.textContent = `準備開始 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`}`;
+                         updateTimerVisuals(stageDuration);
+                         updateRoundCards();
+                         updateButtonStates();
                           setTimeout(() => {
-                             console.log("在跳過零時間階段後自動開始下一階段。");
-                             if (!isPaused) startTimer(); // 開始 *跳過之後* 的那個階段
-                          }, 50); // 短暫延遲
+                             console.log("Auto-starting after skipping zero-time stage.");
+                              const isFinishedCheck = currentRoundNumber > totalRounds && !isBreak;
+                             if (!isPaused && !isFinishedCheck && !isRunning) startTimer();
+                          }, 50);
                      } else {
-                         // 跳過後直接結束了
-                         updateButtonStates(); // 更新到最終狀態
+                         resetTimer(true);
+                         updateButtonStates();
                      }
-                     return; // 不為零時間階段啟動計時循環
+                     return;
                  }
 
-                 // 重置新階段的狀態
-                 reminderShown = false; // 重置提醒顯示標誌
-                 lastDisplayedSeconds = -1; // 重置顯示優化
-                 stageStartTime = performance.now(); // 記錄階段開始的時間戳
+                 reminderShown = false;
+                 lastDisplayedSeconds = -1;
+                 stageStartTime = performance.now();
+                 isRunning = true;
+                 isPaused = false;
 
-                 isRunning = true; // 設定運行狀態
-                 isPaused = false; // 確保未暫停
-
-                 // 更新 UI 文字
                  statusText.textContent = isBreak ? '休息時間' : '討論進行中';
                  currentRound.textContent = `第 ${currentRoundNumber} 輪`;
-                 if (isBreak) breakIndicator.classList.remove('hidden');
-                 else breakIndicator.classList.add('hidden');
+                 breakIndicator.classList.toggle('hidden', !isBreak);
+                 updateButtonStates();
+                 updateRoundCards(); // This will remove 'completed' if jumping back
+                 updateTimerVisuals(stageDuration);
 
-                 updateButtonStates(); // 更新按鈕狀態為 "暫停"
-                 updateRoundCards(); // 高亮新開始的卡片
-                 updateTimerVisuals(stageDuration); // 顯示初始的滿時間和空進度條
-
-                 // 啟動動畫循環
                  animationFrameId = requestAnimationFrame(timerLoop);
             }
 
             function pauseTimer() {
-                // 只有在運行中且未暫停時才能暫停
                 if (!isRunning || isPaused) return;
-                console.log("暫停計時器。");
-                isRunning = false; // 清除運行標誌
-                isPaused = true; // 設定暫停標誌
-                timePaused = performance.now(); // 記錄暫停的時間戳
+                console.log("Pausing timer.");
+                isRunning = false;
+                isPaused = true;
+                timePaused = performance.now();
                 if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId); // 停止動畫循環
+                    cancelAnimationFrame(animationFrameId);
                     animationFrameId = null;
                 }
-                statusText.textContent += ' (已暫停)'; // 更新狀態文字
-                updateRoundCards(); // 移除目前卡片的脈動效果
-                updateButtonStates(); // 更新按鈕為 "繼續"
+                statusText.textContent += ' (已暫停)';
+                updateRoundCards(); // Remove pulse
+                updateButtonStates();
             }
 
              function resetTimer(completed = false) {
-                console.log(`重置計時器。是否完成: ${completed}`);
-                // 停止任何正在運行的計時器循環
+                console.log(`Resetting timer. Completed: ${completed}`);
                 if (animationFrameId) {
                     cancelAnimationFrame(animationFrameId);
                     animationFrameId = null;
                 }
                 isRunning = false;
                 isPaused = false;
+                stageStartTime = 0;
 
-                const wasFinished = currentRoundNumber > totalRounds && !isBreak; // 檢查是否是從完成狀態觸發的 reset
+                const wasFinished = currentRoundNumber > totalRounds && !isBreak;
 
                  if (completed && wasFinished) {
-                     // 如果是流程自然結束觸發的重置 (保留完成狀態)
                      statusText.textContent = '所有討論已結束';
-                     currentRound.textContent = `共 ${totalRounds} 輪`; // 顯示總輪數
+                     currentRound.textContent = `共 ${totalRounds} 輪`;
                      breakIndicator.classList.add('hidden');
-                     stageDuration = 0; // 完成時無持續時間
-                     updateRoundCards(); // 確保所有卡片標記完成
+                     stageDuration = 0;
+                     updateRoundCards();
                  } else {
-                     // 手動重置 或 從未完成狀態重置
-                     currentRoundNumber = 1; // 回到第一輪
-                     isBreak = false; // 不是休息狀態
+                     currentRoundNumber = 1;
+                     isBreak = false;
                      breakIndicator.classList.add('hidden');
-                     statusText.textContent = '準備開始'; // 初始狀態文字
+                     statusText.textContent = '準備開始';
                      currentRound.textContent = `第 ${currentRoundNumber} 輪`;
-                     stageDuration = discussionMinutes * 60 + discussionSeconds; // 設定為第一輪的時間
-                     // 只有在手動重置或從未完成狀態重置時才重新初始化卡片
-                     if (!completed || !wasFinished) {
-                        initializeRoundCards(); // 完全重置時重新生成卡片
-                     }
+                     stageDuration = discussionMinutes * 60 + discussionSeconds;
+                      if (!completed || !wasFinished) {
+                         initializeRoundCards(); // Full rebuild if needed
+                      } else {
+                          updateRoundCards(); // Just update highlighting
+                      }
                  }
 
-                 reminderShown = false; // 重置提醒標誌
-                 lastDisplayedSeconds = -1; // 重置顯示秒數記錄
+                 reminderShown = false;
+                 lastDisplayedSeconds = -1;
 
-                 updateTimerVisuals(stageDuration); // 更新時間顯示 (完成時顯示 00:00)
-                 timerCircle.style.stroke = '#3b82f6'; // 重置圓圈顏色為藍色
-                 timerCircle.style.strokeDashoffset = 100; // 重置圓圈為空
+                 updateTimerVisuals(stageDuration);
+                 // Reset progress bar to empty
+                 timerCircle.style.strokeDashoffset = 100;
 
-                 updateButtonStates(); // 根據新的狀態重置按鈕
-                 // 設定頁面標題
+                 updateButtonStates();
                  document.title = completed ? '佇註解輪流站計時系統 - 已完成' : '佇註解輪流站計時系統';
              }
 
             function skipToNextStage() {
-                 // 只能在運行或暫停時跳過
-                 if (!isRunning && !isPaused) return;
-                 const isFinished = currentRoundNumber > totalRounds && !isBreak;
-                 if (isFinished) return; // 如果已完成，不能跳過
+                 if ((!isRunning && !isPaused) || (currentRoundNumber > totalRounds && !isBreak)) return;
 
-                 console.log("手動跳至下一階段。");
-                 // 停止目前的計時器
+                 console.log("Manual skip to next stage.");
                  if (animationFrameId) {
                      cancelAnimationFrame(animationFrameId);
                      animationFrameId = null;
                  }
                  isRunning = false;
-                 isPaused = false; // 跳過後總是進入準備狀態
+                 isPaused = false;
+                 stageStartTime = 0;
 
-                 // 轉換到下一階段的狀態
+                 const skippedCardId = isBreak ? `break-${currentRoundNumber}` : `round-${currentRoundNumber}`;
+                 markCardCompleted(document.getElementById(skippedCardId));
+
                  const canContinue = proceedToNextStage();
+
                  if (canContinue) {
-                     // 手動跳過後 *立即* 開始下一階段 (不同於時間到的自動轉換)
-                     startTimer();
+                     stageDuration = isBreak ? (breakMinutes * 60 + breakSeconds) : (discussionMinutes * 60 + discussionSeconds);
+                     statusText.textContent = `準備開始 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`}`;
+                     breakIndicator.classList.toggle('hidden', !isBreak);
+                     updateTimerVisuals(stageDuration);
+                     updateRoundCards(); // Update highlighting for the *new* ready stage
+                     updateButtonStates(); // Set to "Start"
+                     timerCircle.style.strokeDashoffset = 100; // Reset progress
+                     showNotification(`已跳至下一階段，準備開始 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`}`, 'info');
+                 } else {
+                     resetTimer(true); // Reached end
                  }
-                 // 如果 proceedToNextStage 返回 false，表示已結束，它內部已呼叫 resetTimer(true)
             }
 
+            // ****** MODIFIED: handleCardClick - Allow jumping to completed ******
             function handleCardClick(event) {
-                // --- 修改：只允許在非運行狀態下跳轉 ---
+                const clickedCard = event.currentTarget;
+
+                // 1. Prevent jump if timer is actively running
                 if (isRunning) {
                     showNotification('請先暫停計時器才能跳轉輪次', 'warning');
                     return;
                 }
 
-                const clickedCard = event.currentTarget;
+                // 2. Parse target stage (REMOVED completed check)
                 const cardId = clickedCard.id;
                 let targetRound, targetIsBreak;
 
-                console.log(`點擊卡片: ${cardId}`);
+                console.log(`Card clicked: ${cardId}`);
 
-                // 解析目標輪次和是否為休息
                 if (cardId.startsWith('round-')) {
                     targetRound = parseInt(cardId.split('-')[1]);
                     targetIsBreak = false;
                 } else if (cardId.startsWith('break-')) {
-                    targetRound = parseInt(cardId.split('-')[1]); // break-i 指的是第 i 輪之後的休息
+                    targetRound = parseInt(cardId.split('-')[1]);
                     targetIsBreak = true;
-                } else return; // 無效 ID
+                } else {
+                    console.warn("Invalid card ID clicked:", cardId);
+                    return;
+                }
 
-                 // 基本驗證
                  if (isNaN(targetRound) || targetRound < 1 || targetRound > totalRounds || (targetIsBreak && targetRound >= totalRounds)) {
-                     console.warn("無效的跳轉目標。");
+                     console.warn("Invalid jump target parsed.");
                      return;
                  }
 
-                 // --- 修改：防止跳轉到目前已暫停的階段 ---
-                 if (isPaused && targetRound === currentRoundNumber && targetIsBreak === isBreak) {
-                     console.log("已處於目標階段 (已暫停)。");
+                // 3. Prevent jump if clicking the *current paused* stage
+                if (isPaused && targetRound === currentRoundNumber && targetIsBreak === isBreak) {
+                     console.log("Already at the target paused stage.");
                      showNotification('已處於您點選的階段 (已暫停)', 'info');
                      return;
                  }
 
+                console.log(`Jumping to: Round ${targetRound}, Is Break: ${targetIsBreak}`);
 
-                 console.log(`跳轉到: 第 ${targetRound} 輪, 是否休息: ${targetIsBreak}`);
+                // Stop timer & reset flags
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                isRunning = false;
+                isPaused = false;
+                stageStartTime = 0;
+                reminderShown = false; // Reset reminder flag on jump
 
-                 // 停止計時器 (雖然前面檢查過 isRunning，但以防萬一)
-                 if (animationFrameId) {
-                     cancelAnimationFrame(animationFrameId);
-                     animationFrameId = null;
-                 }
-                 isRunning = false;
-                 isPaused = false; // 跳轉總是進入 "準備開始" 狀態
+                // Update global state
+                currentRoundNumber = targetRound;
+                isBreak = targetIsBreak;
 
-                 // 更新全域狀態
-                 currentRoundNumber = targetRound;
-                 isBreak = targetIsBreak;
+                showNotification(`已跳轉至 ${isBreak ? `第 ${currentRoundNumber} 輪後休息` : `第 ${currentRoundNumber} 輪討論`}`, 'info');
 
-                 // 顯示跳轉通知
-                 let jumpNotificationMessage = isBreak ? `已跳轉至 第 ${currentRoundNumber} 輪後休息` : `已跳轉至 第 ${currentRoundNumber} 輪討論`;
-                 showNotification(jumpNotificationMessage, 'info');
+                // Set UI to 'ready' state for the target stage
+                stageDuration = isBreak ? (breakMinutes * 60 + breakSeconds) : (discussionMinutes * 60 + discussionSeconds);
+                reminderTime = isBreak ? 0 : (reminderMinutes * 60 + reminderSeconds); // Reset reminder threshold
+                statusText.textContent = `準備開始 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`}`;
+                currentRound.textContent = `第 ${currentRoundNumber} 輪`;
+                breakIndicator.classList.toggle('hidden', !isBreak);
 
-                 // 設定 UI 到跳轉目標的 "準備開始" 狀態
-                 stageDuration = isBreak ? (breakMinutes * 60 + breakSeconds) : (discussionMinutes * 60 + discussionSeconds);
-                 statusText.textContent = `準備開始 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`}`;
-                 currentRound.textContent = `第 ${currentRoundNumber} 輪`;
-                 if (isBreak) breakIndicator.classList.remove('hidden');
-                 else breakIndicator.classList.add('hidden');
-
-                 updateTimerVisuals(stageDuration); // 顯示目標階段的總時間
-                 updateRoundCards(); // 標記之前的卡片完成，高亮目標卡片
-                 updateButtonStates(); // 設定按鈕為 "開始"
-                 timerCircle.style.strokeDashoffset = 100; // 確保圓圈是空的
+                updateTimerVisuals(stageDuration); // Show full time
+                updateRoundCards(); // CRITICAL: This will now mark previous stages complete AND un-complete the target stage for highlighting
+                updateButtonStates(); // Set to "Start"
+                timerCircle.style.strokeDashoffset = 100; // Reset progress bar visually
             }
+            // ****** END MODIFICATION ******
+
 
             function applyNewSettings() {
-                 console.log("套用新設定...");
-                 // 如果計時器正在運行，先停止它
-                 if (animationFrameId) {
-                     cancelAnimationFrame(animationFrameId);
-                     animationFrameId = null;
-                 }
-                 isRunning = false; // 確保狀態一致
+                 console.log("Applying new settings...");
+                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                 animationFrameId = null;
+                 isRunning = false;
                  isPaused = false;
+                 stageStartTime = 0;
 
-                // 讀取並驗證輸入值
                 discussionMinutes = Math.max(0, parseInt(discussionMinutesInput.value) || 0);
                 discussionSeconds = Math.max(0, Math.min(59, parseInt(discussionSecondsInput.value) || 0));
                 reminderMinutes = Math.max(0, parseInt(reminderMinutesInput.value) || 0);
                 reminderSeconds = Math.max(0, Math.min(59, parseInt(reminderSecondsInput.value) || 0));
-                totalRounds = Math.max(1, parseInt(totalRoundsInput.value) || 1); // 總輪數至少為 1
+                totalRounds = Math.max(1, parseInt(totalRoundsInput.value) || 1);
                 breakMinutes = Math.max(0, parseInt(breakMinutesInput.value) || 0);
                 breakSeconds = Math.max(0, Math.min(59, parseInt(breakSecondsInput.value) || 0));
 
-                 // 將驗證後的值寫回輸入框
                  discussionMinutesInput.value = discussionMinutes;
                  discussionSecondsInput.value = discussionSeconds;
                  reminderMinutesInput.value = reminderMinutes;
@@ -1234,143 +1369,143 @@
                  breakMinutesInput.value = breakMinutes;
                  breakSecondsInput.value = breakSeconds;
 
-                 let warnings = []; // 用於收集警告訊息
+                 let warnings = [];
                  const discussionTotalSeconds = discussionMinutes * 60 + discussionSeconds;
-
-                 // 檢查提醒時間是否合理
                  const reminderTotalSeconds = reminderMinutes * 60 + reminderSeconds;
+
                  if (reminderTotalSeconds >= discussionTotalSeconds && discussionTotalSeconds > 0) {
-                     // 如果提醒時間 >= 討論時間，自動調整提醒時間 (例如，提前 10 秒或設為 0)
                      let newReminderTotal = Math.max(0, discussionTotalSeconds - 10);
-                     // if (newReminderTotal < 0) newReminderTotal = 0; // 確保不為負 (雖然 Math.max 已處理)
                      reminderMinutes = Math.floor(newReminderTotal / 60);
                      reminderSeconds = newReminderTotal % 60;
                      reminderMinutesInput.value = reminderMinutes; reminderSecondsInput.value = reminderSeconds;
                      warnings.push("提醒時間已調整為小於討論時間。");
-                 } else if (discussionTotalSeconds <= 0) {
-                      // 如果討論時間為 0 或更少，則提醒時間也應為 0
+                 } else if (discussionTotalSeconds <= 0 && reminderTotalSeconds > 0) {
                       reminderMinutes = 0; reminderSeconds = 0;
                       reminderMinutesInput.value = reminderMinutes; reminderSecondsInput.value = reminderSeconds;
+                      warnings.push("討論時間為0，提醒時間已設為0。")
                  }
 
-                 // 完全重置計時器狀態以應用新設定
-                 initializeRoundCards(); // 根據新的 totalRounds 重新生成卡片
-                 resetTimer(false); // 重置狀態和 UI 到初始狀態
+                 initializeRoundCards();
+                 resetTimer(false);
 
-                 // 顯示結果通知
                  if (warnings.length > 0) {
                     showNotification(warnings.join(' '), 'warning');
                  } else {
                     showNotification('設定已套用', 'info');
                  }
-                 console.log("設定已套用:", { discussionMinutes, discussionSeconds, reminderMinutes, reminderSeconds, totalRounds, breakMinutes, breakSeconds });
+                 console.log("Settings applied:", { discussionMinutes, discussionSeconds, reminderMinutes, reminderSeconds, totalRounds, breakMinutes, breakSeconds });
             }
 
-            // --- 全螢幕邏輯 ---
+            // --- Fullscreen Logic ---
             function toggleFullscreen() {
-                // 檢查目前是否有元素處於全螢幕狀態
                 if (!document.fullscreenElement) {
-                    // 如果沒有，則請求 timerBlock 進入全螢幕
                     timerBlock.requestFullscreen().catch(err => {
-                        // 處理錯誤 (例如使用者拒絕)
-                        console.error(`進入全螢幕失敗: ${err.message} (${err.name})`);
-                        alert(`無法進入全螢幕模式: ${err.message}`);
+                        console.error(`Fullscreen request failed: ${err.message} (${err.name})`);
+                        alert(`無法進入全螢幕模式。\n錯誤訊息: ${err.message}`);
                     });
                 } else {
-                    // 如果已經有元素處於全螢幕狀態 (理論上應該是 timerBlock)，則退出
                     if (document.exitFullscreen) {
                         document.exitFullscreen();
                     }
                 }
             }
 
-            // 更新全螢幕按鈕的圖示和提示文字
             function updateFullscreenButton() {
-                 // 檢查 timerBlock 是否是目前的全螢幕元素
                  if (document.fullscreenElement === timerBlock) {
-                    fullscreenIcon.classList.remove('fa-expand'); // 移除放大圖示
-                    fullscreenIcon.classList.add('fa-compress'); // 加入縮小圖示
-                    fullscreenBtn.title = "退出全螢幕"; // 更新提示文字
+                    fullscreenIcon.classList.replace('fa-expand', 'fa-compress');
+                    fullscreenBtn.title = "退出全螢幕";
                  } else {
-                    fullscreenIcon.classList.remove('fa-compress'); // 移除縮小圖示
-                    fullscreenIcon.classList.add('fa-expand'); // 加入放大圖示
-                    fullscreenBtn.title = "全螢幕"; // 更新提示文字
+                    fullscreenIcon.classList.replace('fa-compress', 'fa-expand');
+                    fullscreenBtn.title = "全螢幕";
                  }
             }
 
 
-            // --- 事件監聽器 ---
+            // --- Event Listeners ---
             startPauseBtn.addEventListener('click', () => {
-                const isFinished = currentRoundNumber > totalRounds && !isBreak;
-                if (isFinished) {
-                    startTimer(); // 處理重新開始
-                } else if (isRunning) {
-                    pauseTimer(); // 正在運行 -> 暫停
-                } else {
-                    startTimer(); // 未運行 (初始或暫停) -> 開始或繼續
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => console.log("AudioContext resumed on Start/Pause click."));
                 }
+                const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                if (isFinished) startTimer();
+                else if (isRunning) pauseTimer();
+                else startTimer();
             });
-            resetBtn.addEventListener('click', () => resetTimer(false)); // 手動重置
-            skipBtn.addEventListener('click', skipToNextStage); // 手動跳過並開始下一階段
-            applySettings.addEventListener('click', applyNewSettings); // 套用設定
+            resetBtn.addEventListener('click', () => resetTimer(false));
+            skipBtn.addEventListener('click', skipToNextStage);
+            applySettings.addEventListener('click', applyNewSettings);
+
             testSound.addEventListener('click', () => {
-                // 確保 AudioContext 已運行 (尤其是在首次點擊時)
                 if (audioContext && audioContext.state === 'suspended') {
                     audioContext.resume().then(() => {
-                        console.log("AudioContext 已恢復。");
+                        console.log("AudioContext resumed by test button.");
                         playSound(soundType.value);
-                    }).catch(err => console.error("測試聲音時恢復 AudioContext 失敗:", err));
-                } else if (audioContext) {
-                    playSound(soundType.value); // 如果已運行，直接播放
+                    }).catch(err => console.error("Test sound resume failed:", err));
+                } else if (audioContext && audioContext.state === 'running') {
+                    playSound(soundType.value);
+                } else if (!audioContext) {
+                    console.warn("AudioContext not initialized.")
                 } else {
-                    console.warn("AudioContext 尚未初始化。") // 理論上 initAudio 會處理
+                     console.warn(`Cannot play test sound, AudioContext state: ${audioContext.state}`);
                 }
             });
-            fullscreenBtn.addEventListener('click', toggleFullscreen); // 新增: 全螢幕按鈕點擊事件
-            // 監聽全螢幕狀態變化事件 (包括按 Esc 鍵退出)
-            document.addEventListener('fullscreenchange', updateFullscreenButton); // 新增
 
-             // 輸入框驗證 (當輸入改變時)
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            mainDarkModeToggle.addEventListener('click', toggleDarkMode);
+
+            document.addEventListener('fullscreenchange', updateFullscreenButton);
+
+             // Input validation
              [discussionSecondsInput, reminderSecondsInput, breakSecondsInput].forEach(input => {
-                input.addEventListener('input', () => { input.value = Math.max(0, Math.min(59, parseInt(input.value) || 0)); });
+                input.addEventListener('input', () => {
+                    let val = parseInt(input.value) || 0;
+                    input.value = Math.max(0, Math.min(59, val));
+                 });
              });
-             [discussionMinutesInput, reminderMinutesInput, breakMinutesInput, totalRoundsInput].forEach(input => {
-                 input.addEventListener('input', () => { input.value = Math.max(input === totalRoundsInput ? 1 : 0, parseInt(input.value) || (input === totalRoundsInput ? 1 : 0)); });
+             [discussionMinutesInput, reminderMinutesInput, breakMinutesInput].forEach(input => {
+                 input.addEventListener('input', () => {
+                    let val = parseInt(input.value) || 0;
+                    input.value = Math.max(0, val);
+                 });
              });
+              totalRoundsInput.addEventListener('input', () => {
+                    let val = parseInt(totalRoundsInput.value) || 1;
+                    totalRoundsInput.value = Math.max(1, val);
+              });
 
-            // 鍵盤快捷鍵
+            // Keyboard shortcuts
             document.addEventListener('keydown', function(e) {
-                // 如果焦點在輸入框、下拉選單或文字區域，則忽略快捷鍵
                 if (e.target.matches('input, select, textarea')) return;
 
-                switch (e.code) { // 使用 e.code 更可靠
-                    case 'Space': // 空白鍵: 開始/暫停/繼續/重啟
-                        e.preventDefault(); // 防止頁面滾動
+                switch (e.code) {
+                    case 'Space':
+                        e.preventDefault();
                         if (!startPauseBtn.disabled) startPauseBtn.click();
                         break;
-                    case 'KeyR': // R 鍵: 重置
+                    case 'KeyR':
                          e.preventDefault();
                          if (!resetBtn.disabled) resetBtn.click();
                          break;
-                    case 'KeyN': // N 鍵: 下一階段 (跳過)
+                    case 'KeyN':
                          e.preventDefault();
                          if (!skipBtn.disabled) skipBtn.click();
                          break;
-                     case 'KeyF': // F 鍵: 切換全螢幕
+                     case 'KeyF':
                           e.preventDefault();
-                          toggleFullscreen();
+                          fullscreenBtn.click();
                           break;
-                    // case 'KeyS': // S 鍵: 套用設定 (可選)
-                    //      e.preventDefault();
-                    //      if (!applySettings.disabled) applySettings.click();
-                    //      break;
+                    case 'KeyD':
+                         e.preventDefault();
+                         mainDarkModeToggle.click();
+                         break;
                 }
             });
 
-            // --- 初始設定 ---
-            initAudio(); // 初始化音效
-            applyNewSettings(); // 套用預設值並初始化 UI (這會呼叫 initializeRoundCards 和 resetTimer)
-            updateFullscreenButton(); // 設定初始全螢幕按鈕狀態
+            // --- Initialization ---
+            initializeTheme();
+            initAudio();
+            applyNewSettings();
+            updateFullscreenButton();
 
         });
     </script>

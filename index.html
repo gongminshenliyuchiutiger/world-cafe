@@ -1,14 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公民咖啡館輪桌計時系統</title>
+    <title>佇註解輪流站計時系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
-        
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background: linear-gradient(135deg, #f9f7f7 0%, #e3f2fd 100%);
@@ -16,29 +17,31 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .content {
             flex: 1;
         }
-        
+
         .timer-circle {
             position: relative;
             width: 280px;
             height: 280px;
         }
-        
+
         .timer-circle svg {
             transform: rotate(-90deg);
         }
-        
-        .timer-circle circle {
-            transition: stroke-dashoffset 1s linear;
+
+        .timer-circle circle#timerCircle {
+            transition: stroke 0.3s ease;
+             stroke-dasharray: 100 100; /* Use pathLength=100 */
+             stroke-dashoffset: 100; /* Start fully empty */
         }
-        
+
         .notification {
             animation: slideIn 0.5s ease-out forwards;
         }
-        
+
         @keyframes slideIn {
             from {
                 transform: translateY(-100%);
@@ -49,210 +52,320 @@
                 opacity: 1;
             }
         }
-        
+
+        /* Base Button Styles */
+        .btn {
+             padding: 0.75rem 1.5rem; /* py-3 px-6 */
+             border-radius: 0.5rem; /* rounded-lg */
+             font-weight: 500; /* font-medium */
+             transition: all 0.3s ease;
+             border: 1px solid transparent; /* Base border */
+             cursor: pointer;
+             display: inline-flex; /* Align icon and text */
+             align-items: center; /* Align icon and text */
+             justify-content: center; /* Center content */
+             gap: 0.5rem; /* Space between icon and text */
+        }
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Primary Button (Start/Continue/Restart) */
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            transition: all 0.3s ease;
+            color: white;
         }
-        
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
-        
+        .btn-primary:disabled {
+            background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+        }
+
+
+        /* Secondary Button (Skip) */
         .btn-secondary {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            transition: all 0.3s ease;
+             color: white;
         }
-        
-        .btn-secondary:hover {
+        .btn-secondary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }
-        
-        .btn-outline {
-            transition: all 0.3s ease;
+         .btn-secondary:disabled {
+             background: linear-gradient(135deg, #fdba74 0%, #fb923c 100%);
         }
-        
-        .btn-outline:hover {
+
+        /* Outline Button (Used for Pause state of toggle button) */
+        .btn-outline-pause {
+             border-color: #3b82f6; /* blue-500 */
+             color: #3b82f6; /* blue-500 */
+             background-color: white; /* Ensure background is white */
+        }
+        .btn-outline-pause:hover:not(:disabled) {
             background-color: rgba(59, 130, 246, 0.1);
         }
-        
+        .btn-outline-pause:disabled {
+             border-color: #d1d5db; /* gray-300 */
+             color: #9ca3af; /* gray-500 */
+             background-color: white;
+        }
+
+        /* Outline Button (Reset) */
+        .btn-outline-reset {
+             border-color: #9ca3af; /* gray-400 */
+             color: #6b7280; /* gray-500 */
+             background-color: white; /* Ensure background is white */
+        }
+        .btn-outline-reset:hover:not(:disabled) {
+            background-color: rgba(156, 163, 175, 0.1); /* Lighter gray */
+        }
+        .btn-outline-reset:disabled {
+             border-color: #d1d5db; /* gray-300 */
+             color: #9ca3af; /* gray-500 */
+             background-color: white;
+        }
+
+
         .table-card {
             transition: all 0.3s ease;
+            cursor: pointer;
         }
-        
+
         .table-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
-        .sound-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        
-        .sound-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .sound-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        
-        .sound-slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .sound-slider {
-            background-color: #3b82f6;
-        }
-        
-        input:checked + .sound-slider:before {
-            transform: translateX(26px);
-        }
-        
+
+        /* --- Sound Switch --- */
+        .sound-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .sound-switch input { opacity: 0; width: 0; height: 0; }
+        .sound-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .sound-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .sound-slider { background-color: #3b82f6; }
+        input:checked + .sound-slider:before { transform: translateX(26px); }
+        /* --- End Sound Switch --- */
+
         footer {
             margin-top: auto;
         }
+
+        /* --- Time Input --- */
+        .time-input {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            align-items: end;
+        }
+        .time-input input {
+            width: 100%;
+            text-align: center;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            appearance: textfield;
+        }
+        .time-input input:focus {
+             outline: none;
+             border-color: #3b82f6;
+             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+        .time-input > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .time-input-label {
+            text-align: center;
+            font-size: 0.75rem;
+            line-height: 1rem;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type=number] {
+          -moz-appearance: textfield;
+        }
+         /* --- End Time Input --- */
+
+         /* Settings Label Icons */
+         .settings-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* space between icon and text */
+         }
+         .settings-label i {
+             color: #6b7280; /* gray-500 */
+             width: 1em; /* Ensure consistent icon width */
+             text-align: center;
+         }
     </style>
 </head>
 <body>
     <div class="content container mx-auto px-4 py-8 max-w-5xl">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-blue-800 mb-2">公民咖啡館輪桌計時系統</h1>
-            <p class="text-gray-600 text-lg">輕鬆管理討論時間，提升會議效率</p>
+             <h1 class="text-4xl font-bold text-blue-800 mb-2 flex items-center justify-center">
+                 <i class="fa-solid fa-hourglass-half mr-3"></i>
+                 <span>佇註解輪流站計時系統</span>
+             </h1>
+            <p class="text-gray-600 text-lg">時間神管理，效率神提升</p>
         </header>
 
-        <div id="notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg notification z-50">
+        <div id="notification" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg notification z-50 max-w-md text-center">
             <p class="font-medium text-lg"></p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- 左側：設定面板 -->
             <div class="bg-white rounded-xl shadow-lg p-6 order-2 lg:order-1">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">時間設定</h2>
-                
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                     <i class="fa-solid fa-gear mr-2 text-gray-600"></i>
+                     時間設定
+                </h2>
+
                 <div class="mb-6">
-                    <label class="block text-gray-700 mb-2 font-medium">每輪討論時間</label>
-                    <div class="flex items-center">
-                        <input type="number" id="discussionMinutes" class="w-20 px-3 py-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="20" min="1">
-                        <span class="text-gray-600">分鐘</span>
+                    <label for="discussionMinutes" class="block text-gray-700 mb-2 font-medium settings-label">
+                        <i class="fa-solid fa-comments"></i>
+                        <span>每輪討論時間</span>
+                    </label>
+                    <div class="time-input">
+                        <div>
+                            <input type="number" id="discussionMinutes" value="5" min="0">
+                            <label for="discussionMinutes" class="time-input-label">分鐘</label>
+                        </div>
+                        <div>
+                            <input type="number" id="discussionSeconds" value="0" min="0" max="59">
+                            <label for="discussionSeconds" class="time-input-label">秒鐘</label>
+                        </div>
                     </div>
                 </div>
-                
+
                 <div class="mb-6">
-                    <label class="block text-gray-700 mb-2 font-medium">輪桌提醒時間</label>
-                    <div class="flex items-center">
-                        <input type="number" id="reminderMinutes" class="w-20 px-3 py-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="2" min="1">
-                        <span class="text-gray-600">分鐘前提醒</span>
+                    <label for="reminderMinutes" class="block text-gray-700 mb-2 font-medium settings-label">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>輪桌提醒時間</span>
+                    </label>
+                    <div class="time-input">
+                        <div>
+                            <input type="number" id="reminderMinutes" value="0" min="0">
+                            <label for="reminderMinutes" class="time-input-label">分鐘</label>
+                        </div>
+                        <div>
+                            <input type="number" id="reminderSeconds" value="30" min="0" max="59">
+                            <label for="reminderSeconds" class="time-input-label">秒鐘</label>
+                        </div>
                     </div>
+                    <p class="text-sm text-gray-500 mt-1">提前多久提醒輪換桌次</p>
                 </div>
-                
+
                 <div class="mb-6">
-                    <label class="block text-gray-700 mb-2 font-medium">總輪桌次數</label>
+                    <label for="totalRounds" class="block text-gray-700 mb-2 font-medium settings-label">
+                        <i class="fa-solid fa-repeat"></i>
+                        <span>總輪桌次數</span>
+                    </label>
                     <div class="flex items-center">
-                        <input type="number" id="totalRounds" class="w-20 px-3 py-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="3" min="1">
+                        <input type="number" id="totalRounds" class="w-full px-3 py-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="3" min="1">
                         <span class="text-gray-600">輪</span>
                     </div>
                 </div>
-                
+
                 <div class="mb-6">
-                    <label class="block text-gray-700 mb-2 font-medium">輪桌間休息時間</label>
-                    <div class="flex items-center">
-                        <input type="number" id="breakMinutes" class="w-20 px-3 py-2 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="5" min="0">
-                        <span class="text-gray-600">分鐘</span>
+                    <label for="breakMinutes" class="block text-gray-700 mb-2 font-medium settings-label">
+                        <i class="fa-solid fa-mug-saucer"></i>
+                        <span>輪桌間休息時間</span>
+                    </label>
+                    <div class="time-input">
+                        <div>
+                            <input type="number" id="breakMinutes" value="0" min="0">
+                            <label for="breakMinutes" class="time-input-label">分鐘</label>
+                        </div>
+                        <div>
+                            <input type="number" id="breakSeconds" value="10" min="0" max="59">
+                            <label for="breakSeconds" class="time-input-label">秒鐘</label>
+                        </div>
                     </div>
                 </div>
-                
+
                 <div class="mb-6">
-                    <label class="flex items-center justify-between text-gray-700 font-medium">
-                        <span>提醒鈴聲</span>
+                    <div class="flex items-center justify-between text-gray-700 font-medium mb-3">
+                        <span class="settings-label"><i class="fa-solid fa-music"></i><span>提醒鈴聲</span></span>
                         <label class="sound-switch">
                             <input type="checkbox" id="soundToggle" checked>
                             <span class="sound-slider"></span>
                         </label>
-                    </label>
-                    <div class="mt-3">
-                        <label class="block text-gray-600 text-sm mb-1">鈴聲類型</label>
-                        <select id="soundType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="soundType" class="block text-gray-600 text-sm mb-1">鈴聲類型</label>
+                        <select id="soundType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                             <option value="bell">溫和鈴聲</option>
                             <option value="chime">清脆鈴聲</option>
                             <option value="alert">警示音</option>
                         </select>
                     </div>
-                    <button id="testSound" class="mt-2 w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition">
+                    <button id="testSound" class="mt-2 w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition btn">
+                        <i class="fa-solid fa-volume-high"></i>
                         測試鈴聲
                     </button>
                 </div>
-                
-                <button id="applySettings" class="w-full btn-primary text-white py-3 px-6 rounded-lg font-medium">
+
+                <button id="applySettings" class="w-full btn btn-primary">
+                    <i class="fa-solid fa-check"></i>
                     套用設定
                 </button>
             </div>
-            
+
             <!-- 中間：計時器 -->
             <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center order-1 lg:order-2">
-                <div class="mb-4">
-                    <h2 class="text-2xl font-bold text-center text-gray-800">
-                        <span id="currentRound">第 1 輪</span>
-                        <span id="breakIndicator" class="hidden text-orange-500">（休息時間）</span>
-                    </h2>
-                    <p id="statusText" class="text-center text-gray-600 mt-1">討論進行中</p>
-                </div>
-                
+                 <h2 class="text-2xl font-bold text-center text-gray-800 mb-4 flex items-center">
+                     <i class="fa-solid fa-clock mr-2 text-gray-600"></i>
+                     <span id="currentRound">第 1 輪</span>
+                     <span id="breakIndicator" class="hidden text-orange-500 ml-1">（休息時間）</span>
+                 </h2>
+                 <p id="statusText" class="text-center text-gray-600 mb-4 min-h-[24px]">準備開始</p>
+
+
                 <div class="timer-circle flex items-center justify-center mb-6">
-                    <svg width="280" height="280">
+                    <svg width="280" height="280" viewbox="0 0 280 280">
                         <circle cx="140" cy="140" r="120" fill="none" stroke="#e5e7eb" stroke-width="16"></circle>
-                        <circle id="timerCircle" cx="140" cy="140" r="120" fill="none" stroke="#3b82f6" stroke-width="16" stroke-dasharray="754" stroke-dashoffset="0"></circle>
+                        <circle id="timerCircle" cx="140" cy="140" r="120" fill="none" stroke="#3b82f6" stroke-width="16" stroke-linecap="round" pathLength="100"></circle>
                     </svg>
                     <div class="absolute text-center">
-                        <div id="timeDisplay" class="text-5xl font-bold text-gray-800">20:00</div>
+                        <div id="timeDisplay" class="text-5xl font-bold text-gray-800 tabular-nums">05:00</div>
                         <div id="timeDescription" class="text-gray-500 mt-2">剩餘時間</div>
                     </div>
                 </div>
-                
-                <div class="flex space-x-4 w-full">
-                    <button id="startBtn" class="flex-1 btn-primary text-white py-3 px-6 rounded-lg font-medium">
-                        開始
+
+                <!-- Combined Start/Pause Button -->
+                <div class="flex space-x-4 w-full mb-4">
+                    <button id="startPauseBtn" class="flex-1 btn btn-primary">
+                        <i id="startPauseIcon" class="fas fa-play"></i>
+                        <span id="startPauseBtnText">開始</span>
                     </button>
-                    <button id="pauseBtn" class="flex-1 btn-outline border border-blue-500 text-blue-500 py-3 px-6 rounded-lg font-medium" disabled>
-                        暫停
-                    </button>
-                    <button id="resetBtn" class="flex-1 btn-outline border border-gray-400 text-gray-500 py-3 px-6 rounded-lg font-medium" disabled>
+                    <button id="resetBtn" class="flex-1 btn btn-outline-reset" disabled>
+                        <i class="fas fa-rotate-left"></i>
                         重置
                     </button>
                 </div>
-                
-                <button id="skipBtn" class="mt-4 w-full btn-secondary text-white py-3 px-6 rounded-lg font-medium" disabled>
-                    跳至下一輪
+
+                <button id="skipBtn" class="w-full btn btn-secondary" disabled>
+                    <i class="fas fa-forward-step"></i>
+                    跳至下一階段
                 </button>
             </div>
-            
+
             <!-- 右側：輪桌狀態 -->
             <div class="bg-white rounded-xl shadow-lg p-6 order-3">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">輪桌進度</h2>
-                
+                 <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                     <i class="fa-solid fa-list-check mr-2 text-gray-600"></i>
+                     輪桌進度
+                 </h2>
+
                 <div id="roundsContainer" class="space-y-4">
                     <!-- 輪桌卡片會在這裡動態生成 -->
                 </div>
@@ -266,11 +379,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 獲取DOM元素
+            // --- DOM Elements ---
             const timeDisplay = document.getElementById('timeDisplay');
             const timerCircle = document.getElementById('timerCircle');
-            const startBtn = document.getElementById('startBtn');
-            const pauseBtn = document.getElementById('pauseBtn');
+            const startPauseBtn = document.getElementById('startPauseBtn');
+            const startPauseIcon = document.getElementById('startPauseIcon');
+            const startPauseBtnText = document.getElementById('startPauseBtnText');
             const resetBtn = document.getElementById('resetBtn');
             const skipBtn = document.getElementById('skipBtn');
             const applySettings = document.getElementById('applySettings');
@@ -279,541 +393,774 @@
             const statusText = document.getElementById('statusText');
             const roundsContainer = document.getElementById('roundsContainer');
             const notification = document.getElementById('notification');
+            const notificationText = notification.querySelector('p');
             const soundToggle = document.getElementById('soundToggle');
             const soundType = document.getElementById('soundType');
             const testSound = document.getElementById('testSound');
-            
-            // 計時器狀態
-            let timer = null;
+            const discussionMinutesInput = document.getElementById('discussionMinutes');
+            const discussionSecondsInput = document.getElementById('discussionSeconds');
+            const reminderMinutesInput = document.getElementById('reminderMinutes');
+            const reminderSecondsInput = document.getElementById('reminderSeconds');
+            const totalRoundsInput = document.getElementById('totalRounds');
+            const breakMinutesInput = document.getElementById('breakMinutes');
+            const breakSecondsInput = document.getElementById('breakSeconds');
+
+            // --- Timer State ---
+            let animationFrameId = null;
             let isRunning = false;
             let isPaused = false;
             let isBreak = false;
             let currentRoundNumber = 1;
-            let timeRemaining = 0;
-            let totalTime = 0;
+            let stageStartTime = 0;
+            let timePaused = 0;
+            let stageDuration = 0;
             let reminderTime = 0;
             let reminderShown = false;
-            
-            // 設定參數
-            let discussionMinutes = 20;
-            let reminderMinutes = 2;
+            let notificationTimeout = null;
+            let lastDisplayedSeconds = -1;
+
+            // --- Settings ---
+            let discussionMinutes = 5;
+            let discussionSeconds = 0;
+            let reminderMinutes = 0;
+            let reminderSeconds = 30;
             let totalRounds = 3;
-            let breakMinutes = 5;
-            
-            // Web Audio API 設定
+            let breakMinutes = 0;
+            let breakSeconds = 10;
+
+            // --- Web Audio API ---
             let audioContext = null;
-            
-            // 初始化 Web Audio API
+
             function initAudio() {
                 try {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 } catch (e) {
-                    console.error('Web Audio API is not supported in this browser');
-                    soundToggle.checked = false;
-                    soundToggle.disabled = true;
-                    testSound.disabled = true;
+                    console.error('Web Audio API is not supported');
                 }
             }
-            
-            // 播放提醒鈴聲
-            function playSound(type = 'bell') {
+
+            function playSound(type = 'bell', isReminder = false) {
                 if (!audioContext || !soundToggle.checked) return;
-                
-                // 確保 AudioContext 處於運行狀態
                 if (audioContext.state === 'suspended') {
-                    audioContext.resume();
+                    audioContext.resume().catch(err => console.error("AudioContext resume failed:", err));
                 }
-                
-                // 創建音頻節點
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                // 連接節點
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                // 設置音量
-                gainNode.gain.value = 0.3;
-                
-                // 根據類型設置不同的音效
+
+                const freq1 = isReminder ? 660 : 880;
+                const freq2 = isReminder ? 880 : 1046.50;
+                const duration = isReminder ? 0.8 : 1.5;
+                const gainValue = isReminder ? 0.15 : 0.3;
+                let oscType = 'sine';
                 switch (type) {
-                    case 'bell':
-                        // 溫和鈴聲
-                        oscillator.type = 'sine';
-                        oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
-                        
-                        // 音量淡入淡出
-                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-                        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1.5);
-                        
-                        // 開始播放並在1.5秒後停止
-                        oscillator.start();
-                        oscillator.stop(audioContext.currentTime + 1.5);
-                        
-                        // 0.5秒後播放第二個音
-                        setTimeout(() => {
-                            const osc2 = audioContext.createOscillator();
-                            const gain2 = audioContext.createGain();
-                            
-                            osc2.connect(gain2);
-                            gain2.connect(audioContext.destination);
-                            
-                            osc2.type = 'sine';
-                            osc2.frequency.setValueAtTime(1046.5, audioContext.currentTime);
-                            
-                            gain2.gain.setValueAtTime(0, audioContext.currentTime);
-                            gain2.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-                            gain2.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1.5);
-                            
-                            osc2.start();
-                            osc2.stop(audioContext.currentTime + 1.5);
-                        }, 500);
-                        break;
-                        
-                    case 'chime':
-                        // 清脆鈴聲
-                        oscillator.type = 'triangle';
-                        oscillator.frequency.setValueAtTime(1318.51, audioContext.currentTime); // E6
-                        
-                        // 音量淡入淡出
-                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
-                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
-                        
-                        // 開始播放並在1秒後停止
-                        oscillator.start();
-                        oscillator.stop(audioContext.currentTime + 1.0);
-                        
-                        // 連續播放三個音
-                        setTimeout(() => {
-                            const osc2 = audioContext.createOscillator();
-                            const gain2 = audioContext.createGain();
-                            
-                            osc2.connect(gain2);
-                            gain2.connect(audioContext.destination);
-                            
-                            osc2.type = 'triangle';
-                            osc2.frequency.setValueAtTime(1567.98, audioContext.currentTime); // G6
-                            
-                            gain2.gain.setValueAtTime(0, audioContext.currentTime);
-                            gain2.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
-                            gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
-                            
-                            osc2.start();
-                            osc2.stop(audioContext.currentTime + 1.0);
-                        }, 200);
-                        
-                        setTimeout(() => {
-                            const osc3 = audioContext.createOscillator();
-                            const gain3 = audioContext.createGain();
-                            
-                            osc3.connect(gain3);
-                            gain3.connect(audioContext.destination);
-                            
-                            osc3.type = 'triangle';
-                            osc3.frequency.setValueAtTime(2093.00, audioContext.currentTime); // C7
-                            
-                            gain3.gain.setValueAtTime(0, audioContext.currentTime);
-                            gain3.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
-                            gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
-                            
-                            osc3.start();
-                            osc3.stop(audioContext.currentTime + 1.0);
-                        }, 400);
-                        break;
-                        
-                    case 'alert':
-                        // 警示音
-                        oscillator.type = 'sawtooth';
-                        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-                        
-                        // 音量淡入淡出
-                        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-                        
-                        // 頻率變化
-                        oscillator.frequency.linearRampToValueAtTime(880, audioContext.currentTime + 0.2);
-                        oscillator.frequency.linearRampToValueAtTime(440, audioContext.currentTime + 0.4);
-                        oscillator.frequency.linearRampToValueAtTime(880, audioContext.currentTime + 0.6);
-                        
-                        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
-                        
-                        // 開始播放並在0.8秒後停止
-                        oscillator.start();
-                        oscillator.stop(audioContext.currentTime + 0.8);
-                        
-                        // 重複播放
-                        setTimeout(() => {
-                            const osc2 = audioContext.createOscillator();
-                            const gain2 = audioContext.createGain();
-                            
-                            osc2.connect(gain2);
-                            gain2.connect(audioContext.destination);
-                            
-                            osc2.type = 'sawtooth';
-                            osc2.frequency.setValueAtTime(440, audioContext.currentTime);
-                            
-                            gain2.gain.setValueAtTime(0, audioContext.currentTime);
-                            gain2.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-                            
-                            osc2.frequency.linearRampToValueAtTime(880, audioContext.currentTime + 0.2);
-                            osc2.frequency.linearRampToValueAtTime(440, audioContext.currentTime + 0.4);
-                            osc2.frequency.linearRampToValueAtTime(880, audioContext.currentTime + 0.6);
-                            
-                            gain2.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
-                            
-                            osc2.start();
-                            osc2.stop(audioContext.currentTime + 0.8);
-                        }, 1000);
-                        break;
+                    case 'chime': oscType = 'triangle'; break;
+                    case 'alert': oscType = 'sawtooth'; break;
+                }
+                const now = audioContext.currentTime;
+
+                const osc1 = audioContext.createOscillator();
+                const gain1 = audioContext.createGain();
+                osc1.connect(gain1);
+                gain1.connect(audioContext.destination);
+                osc1.type = oscType;
+                osc1.frequency.setValueAtTime(freq1, now);
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(gainValue, now + 0.05);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                osc1.start(now);
+                osc1.stop(now + duration);
+
+                if (!isReminder || type !== 'alert') {
+                     setTimeout(() => {
+                        if (!audioContext) return;
+                        const now2 = audioContext.currentTime;
+                        const osc2 = audioContext.createOscillator();
+                        const gain2 = audioContext.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioContext.destination);
+                        osc2.type = oscType;
+                        osc2.frequency.setValueAtTime(freq2, now2);
+                        gain2.gain.setValueAtTime(0, now2);
+                        gain2.gain.linearRampToValueAtTime(gainValue, now2 + 0.05);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, now2 + duration);
+                        osc2.start(now2);
+                        osc2.stop(now2 + duration);
+                    }, isReminder ? 250 : 400);
                 }
             }
-            
-            // 初始化輪桌狀態卡片
-            function initializeRoundCards() {
-                roundsContainer.innerHTML = '';
-                
+
+             // --- UI Update Functions ---
+
+             function initializeRoundCards() {
+                roundsContainer.innerHTML = ''; // Clear existing cards
                 for (let i = 1; i <= totalRounds; i++) {
+                    // Discussion Card
                     const card = document.createElement('div');
                     card.id = `round-${i}`;
-                    card.className = `table-card p-4 border rounded-lg ${i === 1 ? 'bg-blue-50 border-blue-300' : 'bg-gray-50 border-gray-200'}`;
-                    
+                    card.className = 'table-card p-4 border rounded-lg bg-gray-50 border-gray-200';
+                    const discussionTimeText = formatSettingsTime(discussionMinutes, discussionSeconds);
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
                             <div>
                                 <h3 class="font-medium text-lg">第 ${i} 輪討論</h3>
-                                <p class="text-gray-500 text-sm">${discussionMinutes} 分鐘</p>
+                                <p class="text-gray-500 text-sm">${discussionTimeText || '0 秒'}</p>
                             </div>
-                            <div class="w-3 h-3 rounded-full ${i === 1 ? 'bg-blue-500' : 'bg-gray-300'}"></div>
-                        </div>
-                    `;
-                    
+                            <div class="status-indicator w-3 h-3 rounded-full bg-gray-300 shrink-0 ml-2"></div>
+                        </div>`;
+                    card.addEventListener('click', handleCardClick);
                     roundsContainer.appendChild(card);
-                    
-                    if (i < totalRounds && breakMinutes > 0) {
+
+                    // Break Card (if applicable)
+                    const breakTimeTotal = breakMinutes * 60 + breakSeconds;
+                    if (breakTimeTotal > 0 && i < totalRounds) {
                         const breakCard = document.createElement('div');
                         breakCard.id = `break-${i}`;
                         breakCard.className = 'table-card p-4 border rounded-lg bg-gray-50 border-gray-200';
-                        
+                        const breakTimeText = formatSettingsTime(breakMinutes, breakSeconds);
                         breakCard.innerHTML = `
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <h3 class="font-medium text-lg text-orange-500">休息時間</h3>
-                                    <p class="text-gray-500 text-sm">${breakMinutes} 分鐘</p>
+                                    <h3 class="font-medium text-lg text-orange-600">休息時間</h3>
+                                    <p class="text-gray-500 text-sm">${breakTimeText || '0 秒'}</p>
                                 </div>
-                                <div class="w-3 h-3 rounded-full bg-gray-300"></div>
-                            </div>
-                        `;
-                        
+                                <div class="status-indicator w-3 h-3 rounded-full bg-gray-300 shrink-0 ml-2"></div>
+                            </div>`;
+                        breakCard.addEventListener('click', handleCardClick);
                         roundsContainer.appendChild(breakCard);
                     }
                 }
+                updateRoundCards(); // Set initial state
             }
-            
-            // 更新輪桌狀態卡片
+
             function updateRoundCards() {
-                // 重置所有卡片
+                // Reset all cards first
                 document.querySelectorAll('.table-card').forEach(card => {
-                    card.classList.remove('bg-blue-50', 'border-blue-300', 'bg-orange-50', 'border-orange-300');
+                    card.classList.remove('bg-blue-50', 'border-blue-300', 'bg-orange-50', 'border-orange-300', 'bg-green-50', 'border-green-300');
                     card.classList.add('bg-gray-50', 'border-gray-200');
-                    
-                    const indicator = card.querySelector('.rounded-full');
-                    indicator.classList.remove('bg-blue-500', 'bg-orange-500');
+                    const indicator = card.querySelector('.status-indicator');
+                    indicator.classList.remove('bg-blue-500', 'bg-orange-500', 'bg-green-500', 'animate-pulse');
                     indicator.classList.add('bg-gray-300');
                 });
-                
-                // 標記當前輪桌或休息
-                const currentCardId = isBreak ? `break-${currentRoundNumber}` : `round-${currentRoundNumber}`;
-                const currentCard = document.getElementById(currentCardId);
-                
-                if (currentCard) {
-                    if (isBreak) {
-                        currentCard.classList.remove('bg-gray-50', 'border-gray-200');
-                        currentCard.classList.add('bg-orange-50', 'border-orange-300');
-                        
-                        const indicator = currentCard.querySelector('.rounded-full');
-                        indicator.classList.remove('bg-gray-300');
-                        indicator.classList.add('bg-orange-500');
-                    } else {
-                        currentCard.classList.remove('bg-gray-50', 'border-gray-200');
-                        currentCard.classList.add('bg-blue-50', 'border-blue-300');
-                        
-                        const indicator = currentCard.querySelector('.rounded-full');
-                        indicator.classList.remove('bg-gray-300');
-                        indicator.classList.add('bg-blue-500');
+
+                // Determine which rounds/breaks are completed
+                const completedUpToRound = isBreak ? currentRoundNumber : currentRoundNumber - 1;
+                for (let i = 1; i <= completedUpToRound; i++) {
+                    const completedRoundCard = document.getElementById(`round-${i}`);
+                    if (completedRoundCard) markCardCompleted(completedRoundCard);
+                    // Mark breaks *between* completed rounds or after last completed round if timer finished
+                    if (i < completedUpToRound || (i === completedUpToRound && !isBreak && currentRoundNumber > totalRounds) ) {
+                        const completedBreakCard = document.getElementById(`break-${i}`);
+                        if (completedBreakCard) markCardCompleted(completedBreakCard);
                     }
                 }
-                
-                // 標記已完成的輪桌
-                for (let i = 1; i < currentRoundNumber; i++) {
-                    const completedRound = document.getElementById(`round-${i}`);
-                    if (completedRound) {
-                        const indicator = completedRound.querySelector('.rounded-full');
-                        indicator.classList.remove('bg-gray-300', 'bg-blue-500');
-                        indicator.classList.add('bg-green-500');
-                    }
-                    
-                    const completedBreak = document.getElementById(`break-${i}`);
-                    if (completedBreak) {
-                        const indicator = completedBreak.querySelector('.rounded-full');
-                        indicator.classList.remove('bg-gray-300', 'bg-orange-500');
-                        indicator.classList.add('bg-green-500');
+
+                 // If the process is finished, mark the last round/break as completed too
+                 const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                 if (isFinished) {
+                     const finalRoundCard = document.getElementById(`round-${totalRounds}`);
+                     if (finalRoundCard) markCardCompleted(finalRoundCard);
+                     const finalBreakCard = document.getElementById(`break-${totalRounds - 1}`);
+                     if (finalBreakCard) markCardCompleted(finalBreakCard);
+                 }
+
+                // Highlight the current stage (if not finished and running or paused)
+                if (!isFinished && (isRunning || isPaused)) {
+                    const currentCardId = isBreak ? `break-${currentRoundNumber}` : `round-${currentRoundNumber}`;
+                    const currentCard = document.getElementById(currentCardId);
+                    if (currentCard) {
+                        currentCard.classList.remove('bg-gray-50', 'border-gray-200');
+                        const indicator = currentCard.querySelector('.status-indicator');
+                        indicator.classList.remove('bg-gray-300');
+                        indicator.classList.add('animate-pulse');
+
+                        if (isBreak) {
+                            currentCard.classList.add('bg-orange-50', 'border-orange-300');
+                            indicator.classList.add('bg-orange-500');
+                        } else {
+                            currentCard.classList.add('bg-blue-50', 'border-blue-300');
+                            indicator.classList.add('bg-blue-500');
+                        }
                     }
                 }
             }
-            
-            // 格式化時間
-            function formatTime(seconds) {
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
+
+            function markCardCompleted(cardElement) {
+                 if (!cardElement) return;
+                 cardElement.classList.remove('bg-blue-50', 'border-blue-300', 'bg-orange-50', 'border-orange-300', 'bg-gray-50', 'border-gray-200');
+                 cardElement.classList.add('bg-green-50', 'border-green-300');
+                 const indicator = cardElement.querySelector('.status-indicator');
+                 indicator.classList.remove('bg-blue-500', 'bg-orange-500', 'bg-gray-300', 'animate-pulse');
+                 indicator.classList.add('bg-green-500');
+            }
+
+            function formatSettingsTime(minutes, seconds) {
+                let parts = [];
+                if (minutes > 0) parts.push(`${minutes} 分鐘`);
+                if (seconds > 0) parts.push(`${seconds} 秒`);
+                return parts.join(' ') || null;
+            }
+
+            function formatTimerDisplay(seconds) {
+                const displaySeconds = Math.max(0, Math.ceil(seconds));
+                const mins = Math.floor(displaySeconds / 60);
+                const secs = displaySeconds % 60;
                 return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
-            
-            // 更新計時器顯示
-            function updateTimerDisplay() {
-                timeDisplay.textContent = formatTime(timeRemaining);
-                
-                // 更新圓環進度
-                const circumference = 2 * Math.PI * 120;
-                const offset = circumference - (timeRemaining / totalTime) * circumference;
-                timerCircle.style.strokeDasharray = circumference;
-                timerCircle.style.strokeDashoffset = offset;
-                
-                // 當時間少於20%時，改變顏色
-                if (timeRemaining / totalTime < 0.2) {
-                    timerCircle.style.stroke = '#ef4444';
-                } else {
-                    timerCircle.style.stroke = '#3b82f6';
+
+            function updateTimerVisuals(preciseTimeRemaining) {
+                const displaySeconds = Math.max(0, preciseTimeRemaining);
+
+                // Update Text Display
+                const currentWholeSeconds = Math.ceil(displaySeconds);
+                if (currentWholeSeconds !== lastDisplayedSeconds) {
+                     timeDisplay.textContent = formatTimerDisplay(displaySeconds);
+                     lastDisplayedSeconds = currentWholeSeconds;
+
+                      let titleStage = isBreak ? `休息 (${currentRoundNumber}/${totalRounds})` : `第 ${currentRoundNumber} 輪`;
+                      const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                      if (isFinished) titleStage = "已完成";
+                      document.title = `${formatTimerDisplay(displaySeconds)} - ${titleStage} | 輪流站計時`;
                 }
-                
-                // 更新頁面標題
-                document.title = `${formatTime(timeRemaining)} - 公民咖啡館輪桌計時系統`;
+
+                // Update Circle
+                const percentage = stageDuration > 0 ? ((stageDuration - displaySeconds) / stageDuration) * 100 : 0;
+                const clampedPercentage = Math.max(0, Math.min(100, percentage));
+                // Offset starts at 100 (empty) and goes towards 0 (full)
+                timerCircle.style.strokeDashoffset = 100 - clampedPercentage;
+
+                // Update Circle Color
+                let circleColor = '#3b82f6'; // Blue
+                if (isBreak) {
+                    circleColor = '#f97316'; // Orange
+                } else if (!reminderShown && reminderTime > 0 && displaySeconds <= reminderTime) {
+                     circleColor = '#f59e0b'; // Amber/Yellow
+                } else if (stageDuration > 0 && displaySeconds / stageDuration < 0.15) { // Last 15%
+                    circleColor = '#ef4444'; // Red
+                }
+                 if (timerCircle.style.stroke !== circleColor) {
+                    timerCircle.style.stroke = circleColor;
+                 }
             }
-            
-            // 顯示通知
-            function showNotification(message, isWarning = false) {
-                const notificationElement = document.getElementById('notification');
-                notificationElement.querySelector('p').textContent = message;
-                
-                if (isWarning) {
-                    notificationElement.classList.remove('bg-blue-600');
-                    notificationElement.classList.add('bg-orange-500');
-                    
-                    // 播放提醒鈴聲
-                    playSound(soundType.value);
+
+             function updateButtonStates() {
+                 const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                 const canReset = isRunning || isPaused || currentRoundNumber > 1 || isBreak || isFinished || (currentRoundNumber === 1 && !isBreak && !isRunning && !isPaused);
+                 const canSkip = (isRunning || isPaused) && !isFinished;
+
+                 resetBtn.disabled = !canReset;
+                 skipBtn.disabled = !canSkip;
+
+                 // Update Start/Pause Toggle Button
+                 startPauseBtn.disabled = false;
+                 startPauseBtn.classList.remove('btn-primary', 'btn-outline-pause');
+
+                 if (isFinished) {
+                     startPauseBtnText.textContent = '再開始';
+                     startPauseIcon.className = 'fas fa-rotate-right';
+                     startPauseBtn.classList.add('btn-primary');
+                 } else if (isRunning && !isPaused) {
+                     startPauseBtnText.textContent = '暫停';
+                     startPauseIcon.className = 'fas fa-pause';
+                     startPauseBtn.classList.add('btn-outline-pause');
+                 } else if (isPaused) {
+                     startPauseBtnText.textContent = '繼續';
+                     startPauseIcon.className = 'fas fa-play';
+                     startPauseBtn.classList.add('btn-primary');
+                 } else { // Initial state or ready for next round (after auto-transition)
+                     startPauseBtnText.textContent = '開始';
+                     startPauseIcon.className = 'fas fa-play';
+                     startPauseBtn.classList.add('btn-primary');
+                 }
+            }
+
+
+            function showNotification(message, type = 'info') {
+                if (notificationTimeout) clearTimeout(notificationTimeout);
+
+                notificationText.textContent = message;
+                notification.classList.remove('hidden', 'bg-blue-600', 'bg-orange-500', 'bg-green-600');
+
+                let bgColor = 'bg-blue-600';
+                let shouldPlaySound = false;
+                let isReminderSound = false;
+
+                if (type === 'warning') {
+                     bgColor = 'bg-orange-500';
+                     shouldPlaySound = true;
+                     isReminderSound = true;
+                } else if (type === 'success') {
+                     bgColor = 'bg-green-600';
+                     shouldPlaySound = true;
                 } else {
-                    notificationElement.classList.remove('bg-orange-500');
-                    notificationElement.classList.add('bg-blue-600');
-                    
-                    // 播放提醒鈴聲
-                    if (message.includes('開始') || message.includes('結束')) {
-                        playSound(soundType.value);
+                    // Play sound for key transitions
+                    if (message.includes('開始') || message.includes('結束') || message.includes('輪討論') || message.includes('跳轉') || message.includes('重新開始') || message.includes('完成') || message.includes('休息時間')) {
+                         shouldPlaySound = true;
                     }
                 }
-                
-                notificationElement.classList.remove('hidden');
-                
-                setTimeout(() => {
-                    notificationElement.classList.add('hidden');
-                }, 5000);
-            }
-            
-            // 開始計時器
-            function startTimer() {
-                if (isRunning && !isPaused) return;
-                
-                if (!isPaused) {
-                    // 如果不是從暫停恢復，則初始化計時器
-                    timeRemaining = isBreak ? breakMinutes * 60 : discussionMinutes * 60;
-                    totalTime = timeRemaining;
-                    reminderTime = reminderMinutes * 60;
-                    reminderShown = false;
+
+                if(shouldPlaySound) {
+                    playSound(soundType.value, isReminderSound);
                 }
-                
-                isRunning = true;
-                isPaused = false;
-                
-                startBtn.disabled = true;
-                pauseBtn.disabled = false;
-                resetBtn.disabled = false;
-                skipBtn.disabled = false;
-                
-                updateTimerDisplay();
-                
-                timer = setInterval(() => {
-                    timeRemaining--;
-                    
-                    // 檢查是否需要顯示提醒
-                    if (!isBreak && !reminderShown && timeRemaining <= reminderTime && timeRemaining > 0) {
-                        showNotification(`還剩 ${reminderMinutes} 分鐘，請準備輪換桌次`, true);
-                        reminderShown = true;
-                    }
-                    
-                    updateTimerDisplay();
-                    
-                    if (timeRemaining <= 0) {
-                        clearInterval(timer);
-                        
-                        if (isBreak) {
-                            // 休息結束，進入下一輪討論
-                            isBreak = false;
-                            showNotification(`第 ${currentRoundNumber} 輪討論開始！`);
-                            breakIndicator.classList.add('hidden');
-                            statusText.textContent = '討論進行中';
-                        } else if (currentRoundNumber < totalRounds) {
-                            // 討論結束，進入休息或下一輪
-                            if (breakMinutes > 0) {
-                                isBreak = true;
-                                showNotification('休息時間開始！');
-                                breakIndicator.classList.remove('hidden');
-                                statusText.textContent = '休息時間';
-                            } else {
-                                currentRoundNumber++;
-                                showNotification(`第 ${currentRoundNumber} 輪討論開始！`);
-                            }
-                        } else {
-                            // 所有輪桌結束
-                            showNotification('所有輪桌討論已結束！');
-                            resetTimer(true);
-                            return;
-                        }
-                        
-                        // 更新UI
-                        if (!isBreak && breakMinutes > 0) {
-                            currentRoundNumber++;
-                        }
-                        
+
+                notification.classList.add(bgColor);
+                notification.style.animation = 'none';
+                requestAnimationFrame(() => {
+                    notification.style.animation = '';
+                    notification.classList.add('notification');
+                });
+
+                 notificationTimeout = setTimeout(() => {
+                    notification.classList.add('hidden');
+                    notificationTimeout = null;
+                }, 5000); // Keep notification for 5 seconds
+            }
+
+            // --- Core Timer Logic ---
+
+            function proceedToNextStage() {
+                 console.log(`Proceeding from: Round ${currentRoundNumber}, isBreak: ${isBreak}`);
+                 // Mark current stage visually completed *before* state changes
+                 const currentCardId = isBreak ? `break-${currentRoundNumber}` : `round-${currentRoundNumber}`;
+                 const currentCard = document.getElementById(currentCardId);
+                 if(currentCard) markCardCompleted(currentCard);
+
+                 if (isBreak) {
+                    isBreak = false;
+                    currentRoundNumber++; // Move to the next round number
+                    if (currentRoundNumber > totalRounds) {
+                        // Finished the last break (or there was no break after last round)
+                        showNotification('所有輪桌討論已結束！', 'success');
+                        resetTimer(true); // Reset to completed state
+                        console.log("All rounds finished.");
+                        return false; // Cannot continue
+                    } else {
+                        // Setup for next discussion round
+                        showNotification(`第 ${currentRoundNumber} 輪討論開始！`);
+                        statusText.textContent = '討論進行中'; // Status will be updated by startTimer
+                        breakIndicator.classList.add('hidden');
                         currentRound.textContent = `第 ${currentRoundNumber} 輪`;
-                        updateRoundCards();
-                        
-                        // 自動開始下一輪計時
-                        startTimer();
                     }
-                }, 1000);
+                } else { // Was in a discussion round
+                     const hasBreakTime = breakMinutes * 60 + breakSeconds > 0;
+                     if (hasBreakTime && currentRoundNumber < totalRounds) {
+                        // Move to break *after* the current round
+                        isBreak = true;
+                        showNotification('休息時間開始！');
+                        statusText.textContent = '休息時間'; // Status will be updated by startTimer
+                        breakIndicator.classList.remove('hidden');
+                        // currentRoundNumber stays the same for the break *after* round X
+                    } else {
+                         // No break, or it was the last round, move to next round number
+                         isBreak = false;
+                         currentRoundNumber++;
+                         if (currentRoundNumber > totalRounds) {
+                             // Finished the last discussion round
+                             showNotification('所有輪桌討論已結束！', 'success');
+                             resetTimer(true); // Reset to completed state
+                             console.log("All rounds finished (no final break or break skipped).");
+                             return false; // Cannot continue
+                         } else {
+                            // Setup for next discussion round (skipped break)
+                            showNotification(`第 ${currentRoundNumber} 輪討論開始！`);
+                            statusText.textContent = '討論進行中'; // Status will be updated by startTimer
+                            breakIndicator.classList.add('hidden');
+                            currentRound.textContent = `第 ${currentRoundNumber} 輪`;
+                         }
+                    }
+                }
+                updateRoundCards(); // Update card highlights for the *new* state (before timer starts)
+                console.log(`Proceeding TO: Round ${currentRoundNumber}, isBreak: ${isBreak}`);
+                return true; // Can continue to the next stage
             }
-            
-            // 暫停計時器
+
+            // --- MODIFIED timerLoop ---
+             function timerLoop(timestamp) {
+                 if (!isRunning || isPaused) return; // Stop loop if not running or paused
+
+                 // Calculate elapsed time in seconds since stage start
+                 const elapsedSeconds = (timestamp - stageStartTime) / 1000;
+                 // Calculate precise time remaining
+                 let preciseTimeRemaining = stageDuration - elapsedSeconds;
+
+                 // Update visuals
+                 updateTimerVisuals(preciseTimeRemaining);
+
+                 // Reminder Check (only during discussion, if reminder is set)
+                 if (!isBreak && !reminderShown && reminderTime > 0 && preciseTimeRemaining <= reminderTime) {
+                     const reminderTimeText = formatSettingsTime(reminderMinutes, reminderSeconds);
+                     showNotification(`剩下 ${reminderTimeText}，請準備輪換！`, 'warning');
+                     reminderShown = true;
+                     // Update color immediately if reminder triggers
+                     timerCircle.style.stroke = '#f59e0b';
+                 }
+
+                 // --- Time's Up Check ---
+                 if (preciseTimeRemaining <= 0) {
+                     console.log("Time's up for current stage.");
+                     isRunning = false; // Stop running flag
+                     cancelAnimationFrame(animationFrameId); // Stop the loop
+                     animationFrameId = null;
+
+                     // Ensure final display shows 00:00 and full circle
+                     updateTimerVisuals(0);
+
+                     // Try to move to the next stage
+                     const canContinue = proceedToNextStage();
+
+                     if (canContinue) {
+                         console.log("Scheduling automatic start for the next stage...");
+                         // Automatically start the next stage after a short delay
+                         setTimeout(() => {
+                             console.log("Auto-starting next stage now.");
+                             // Make sure we are not paused before auto-starting
+                             // And check if the user clicked reset during the 1s delay
+                             const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                             if (!isPaused && !isFinished) { // Check if finished state reached by reset
+                                 startTimer(); // Start the new stage prepared by proceedToNextStage
+                             } else {
+                                 console.log("Timer was paused or reset during transition, will not auto-start.")
+                                 // If paused/reset during transition, update UI to reflect ready state
+                                 if(isPaused) {
+                                    stageDuration = isBreak ? (breakMinutes * 60 + breakSeconds) : (discussionMinutes * 60 + discussionSeconds);
+                                    updateTimerVisuals(stageDuration); // Show full time for next stage
+                                    statusText.textContent = `準備開始 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`} (已暫停)`; // Indicate paused and ready
+                                    updateButtonStates(); // Set button to 'Continue'
+                                 }
+                                 // If reset, resetTimer already handled UI update.
+                             }
+                         }, 1000); // 1 second delay for notification readability
+                     } else {
+                         console.log("End of process reached.");
+                         // resetTimer(true) was called by proceedToNextStage
+                         document.title = '輪流站計時系統 - 已完成';
+                         // Button states are already updated by resetTimer(true)
+                     }
+                 } else {
+                     // Request the next frame
+                     animationFrameId = requestAnimationFrame(timerLoop);
+                 }
+             }
+             // --- END MODIFIED timerLoop ---
+
+
+            function startTimer() {
+                 const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                 if (isFinished) {
+                     console.log("Restarting after completion.");
+                     resetTimer(false); // Full reset
+                      // Need to start round 1 after reset
+                      setTimeout(startTimer, 50); // Give DOM a moment then start round 1
+                     return;
+                 }
+
+                 // Prevent starting if already running (safety check)
+                 if (isRunning) {
+                     console.warn("Timer already running.");
+                     return;
+                 }
+
+                 // Resume from pause
+                 if (isPaused) {
+                     console.log("Resuming timer.");
+                     isPaused = false;
+                     isRunning = true;
+                     const pauseDurationMs = performance.now() - timePaused;
+                     stageStartTime += pauseDurationMs; // Adjust start time
+                     statusText.textContent = isBreak ? '休息時間' : '討論進行中'; // Restore status
+                     updateButtonStates();
+                     animationFrameId = requestAnimationFrame(timerLoop); // Restart loop
+                     return;
+                 }
+
+                 // Starting a new stage (first start or auto-transition)
+                 console.log(`Starting new stage: Round ${currentRoundNumber}, isBreak: ${isBreak}`);
+
+                 // Set duration for the current stage
+                 if (isBreak) {
+                     stageDuration = breakMinutes * 60 + breakSeconds;
+                     reminderTime = 0; // No reminder during breaks
+                 } else {
+                     stageDuration = discussionMinutes * 60 + discussionSeconds;
+                     reminderTime = reminderMinutes * 60 + reminderSeconds;
+                 }
+
+                 // Handle zero duration stages - auto skip
+                 if (stageDuration <= 0) {
+                     console.warn(`Attempted to start timer with ${stageDuration} seconds. Skipping stage.`);
+                     showNotification(`時間設為 0，跳過 ${isBreak ? '休息' : `第 ${currentRoundNumber} 輪`}`, 'warning');
+                     updateTimerVisuals(0); // Show 00:00 briefly
+                     // Directly proceed and schedule the *next* stage start
+                     const canContinue = proceedToNextStage();
+                     if (canContinue) {
+                         // Schedule the *next* stage start instead of this one
+                          setTimeout(() => {
+                             console.log("Auto-starting next stage after skipping zero duration.");
+                             if (!isPaused) startTimer(); // Start the stage *after* the skipped one
+                          }, 50); // Short delay after skipping
+                     } else {
+                         // Finished after skipping
+                         updateButtonStates(); // Final state update
+                     }
+                     return; // Don't start the timer loop for zero duration
+                 }
+
+                 // Reset state for the new stage
+                 reminderShown = false;
+                 lastDisplayedSeconds = -1; // Reset display optimization
+                 stageStartTime = performance.now(); // Record start time
+
+                 isRunning = true;
+                 isPaused = false;
+
+                 // Update UI Text
+                 statusText.textContent = isBreak ? '休息時間' : '討論進行中';
+                 currentRound.textContent = `第 ${currentRoundNumber} 輪`;
+                 if (isBreak) breakIndicator.classList.remove('hidden');
+                 else breakIndicator.classList.add('hidden');
+
+                 updateButtonStates(); // Update buttons to 'Pause' state
+                 updateRoundCards(); // Highlight the newly started card
+                 updateTimerVisuals(stageDuration); // Show initial full time/circle
+
+                 // Start the animation loop
+                 animationFrameId = requestAnimationFrame(timerLoop);
+            }
+
             function pauseTimer() {
-                if (!isRunning) return;
-                
-                clearInterval(timer);
+                if (!isRunning || isPaused) return; // Only pause if running
+                console.log("Pausing timer.");
+                isRunning = false; // Stop running flag
                 isPaused = true;
-                
-                startBtn.disabled = false;
-                startBtn.textContent = '繼續';
-                pauseBtn.disabled = true;
+                timePaused = performance.now();
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+                statusText.textContent += ' (已暫停)';
+                updateButtonStates(); // Update button to 'Continue' state
             }
-            
-            // 重置計時器
-            function resetTimer(completed = false) {
-                clearInterval(timer);
+
+             function resetTimer(completed = false) {
+                console.log(`Resetting timer. Completed: ${completed}`);
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
                 isRunning = false;
                 isPaused = false;
-                
-                if (!completed) {
-                    currentRoundNumber = 1;
-                    isBreak = false;
-                    breakIndicator.classList.add('hidden');
-                    statusText.textContent = '討論進行中';
-                    currentRound.textContent = `第 ${currentRoundNumber} 輪`;
-                }
-                
-                timeRemaining = discussionMinutes * 60;
-                totalTime = timeRemaining;
-                
-                startBtn.disabled = false;
-                startBtn.textContent = '開始';
-                pauseBtn.disabled = true;
-                resetBtn.disabled = true;
-                skipBtn.disabled = true;
-                
-                updateTimerDisplay();
-                updateRoundCards();
-                
-                // 重置頁面標題
-                document.title = '公民咖啡館輪桌計時系統';
+
+                const wasFinished = currentRoundNumber > totalRounds && !isBreak;
+
+                 if (completed && wasFinished) {
+                     // Final completed state
+                     statusText.textContent = '所有討論已結束';
+                     currentRound.textContent = `共 ${totalRounds} 輪`;
+                     breakIndicator.classList.add('hidden');
+                     stageDuration = 0;
+                     updateRoundCards(); // Ensure all marked complete
+                 } else {
+                     // Manual reset or reset from incomplete state
+                     currentRoundNumber = 1;
+                     isBreak = false;
+                     breakIndicator.classList.add('hidden');
+                     statusText.textContent = '準備開始';
+                     currentRound.textContent = `第 ${currentRoundNumber} 輪`;
+                     stageDuration = discussionMinutes * 60 + discussionSeconds;
+                     // Reset cards only if not already finished and completed=true
+                     if (!completed || !wasFinished) {
+                        initializeRoundCards(); // Rebuild cards on full reset
+                        // updateRoundCards(); // Set initial highlight state
+                     }
+                 }
+
+                 reminderShown = false;
+                 lastDisplayedSeconds = -1;
+
+                 updateTimerVisuals(stageDuration); // Update timer display
+                 timerCircle.style.stroke = '#3b82f6'; // Reset circle color
+                 timerCircle.style.strokeDashoffset = 100; // Reset circle to empty
+
+                 updateButtonStates(); // Reset button states based on new state
+                 document.title = completed ? '佇註解輪流站計時系統 - 已完成' : '佇註解輪流站計時系統';
+             }
+
+            function skipToNextStage() {
+                 if (!isRunning && !isPaused) return; // Can only skip if active/paused
+                 const isFinished = currentRoundNumber > totalRounds && !isBreak;
+                 if (isFinished) return; // Cannot skip if already finished
+
+                 console.log("Skipping to next stage manually.");
+                 // Stop current timer/animation
+                 if (animationFrameId) {
+                     cancelAnimationFrame(animationFrameId);
+                     animationFrameId = null;
+                 }
+                 isRunning = false;
+                 isPaused = false; // Ensure not paused after skip
+
+                 // Proceed state and start next timer if possible
+                 const canContinue = proceedToNextStage();
+                 if (canContinue) {
+                     // Immediately start the next stage (no delay for manual skip)
+                     startTimer();
+                 }
+                 // If proceedToNextStage returned false, it already called resetTimer(true)
             }
-            
-            // 跳至下一輪
-            function skipToNextRound() {
-                clearInterval(timer);
-                
-                if (isBreak) {
-                    // 如果在休息時間，跳到下一輪討論
-                    isBreak = false;
-                    breakIndicator.classList.add('hidden');
-                    statusText.textContent = '討論進行中';
-                } else if (currentRoundNumber < totalRounds) {
-                    // 如果在討論時間，且不是最後一輪
-                    if (breakMinutes > 0) {
-                        isBreak = true;
-                        breakIndicator.classList.remove('hidden');
-                        statusText.textContent = '休息時間';
-                    } else {
-                        currentRoundNumber++;
-                    }
-                } else {
-                    // 如果是最後一輪，結束所有討論
-                    showNotification('所有輪桌討論已結束！');
-                    resetTimer(true);
-                    return;
-                }
-                
-                // 更新UI
-                if (!isBreak && breakMinutes > 0) {
-                    currentRoundNumber++;
-                }
-                
-                if (currentRoundNumber > totalRounds) {
-                    showNotification('所有輪桌討論已結束！');
-                    resetTimer(true);
-                    return;
-                }
-                
-                currentRound.textContent = `第 ${currentRoundNumber} 輪`;
-                updateRoundCards();
-                
-                // 自動開始下一輪計時
-                startTimer();
+
+            function handleCardClick(event) {
+                const clickedCard = event.currentTarget;
+                const cardId = clickedCard.id;
+                let targetRound, targetIsBreak;
+
+                console.log(`Card clicked: ${cardId}`);
+
+                if (cardId.startsWith('round-')) {
+                    targetRound = parseInt(cardId.split('-')[1]);
+                    targetIsBreak = false;
+                } else if (cardId.startsWith('break-')) {
+                    targetRound = parseInt(cardId.split('-')[1]); // Break *after* this round number
+                    targetIsBreak = true;
+                } else return;
+
+                 // Basic validation
+                 if (isNaN(targetRound) || targetRound < 1 || targetRound > totalRounds || (targetIsBreak && targetRound >= totalRounds)) {
+                     console.warn("Invalid jump target.");
+                     return;
+                 }
+
+                 console.log(`Jumping to: Round ${targetRound}, isBreak: ${targetIsBreak}`);
+
+                 // Stop current timer/animation
+                 if (animationFrameId) {
+                     cancelAnimationFrame(animationFrameId);
+                     animationFrameId = null;
+                 }
+                 isRunning = false;
+                 isPaused = false; // Ensure not paused after jump
+
+                 // Update global state
+                 currentRoundNumber = targetRound;
+                 isBreak = targetIsBreak;
+
+                 let jumpNotificationMessage = isBreak ? `已跳轉至 第 ${currentRoundNumber} 輪後休息` : `已跳轉至 第 ${currentRoundNumber} 輪討論`;
+                 showNotification(jumpNotificationMessage, 'info');
+
+                 // Start the timer for the selected stage immediately
+                 startTimer();
             }
-            
-            // 套用設定
+
             function applyNewSettings() {
-                discussionMinutes = parseInt(document.getElementById('discussionMinutes').value) || 20;
-                reminderMinutes = parseInt(document.getElementById('reminderMinutes').value) || 2;
-                totalRounds = parseInt(document.getElementById('totalRounds').value) || 3;
-                breakMinutes = parseInt(document.getElementById('breakMinutes').value) || 5;
-                
-                // 驗證設定
-                if (reminderMinutes >= discussionMinutes) {
-                    reminderMinutes = discussionMinutes - 1;
-                    document.getElementById('reminderMinutes').value = reminderMinutes;
-                    showNotification('提醒時間已調整為小於討論時間', true);
-                }
-                
-                // 重置計時器
-                resetTimer();
-                
-                // 重新初始化輪桌卡片
-                initializeRoundCards();
-                
-                showNotification('設定已套用');
+                 console.log("Applying new settings...");
+                 if (animationFrameId) { // Stop timer if running
+                     cancelAnimationFrame(animationFrameId);
+                     animationFrameId = null;
+                 }
+                 isRunning = false; // Ensure state consistency
+                 isPaused = false;
+
+                // Read and validate values
+                discussionMinutes = Math.max(0, parseInt(discussionMinutesInput.value) || 0);
+                discussionSeconds = Math.max(0, Math.min(59, parseInt(discussionSecondsInput.value) || 0));
+                reminderMinutes = Math.max(0, parseInt(reminderMinutesInput.value) || 0);
+                reminderSeconds = Math.max(0, Math.min(59, parseInt(reminderSecondsInput.value) || 0));
+                totalRounds = Math.max(1, parseInt(totalRoundsInput.value) || 1);
+                breakMinutes = Math.max(0, parseInt(breakMinutesInput.value) || 0);
+                breakSeconds = Math.max(0, Math.min(59, parseInt(breakSecondsInput.value) || 0));
+
+                 // Update input fields to reflect validated values
+                 discussionMinutesInput.value = discussionMinutes;
+                 discussionSecondsInput.value = discussionSeconds;
+                 reminderMinutesInput.value = reminderMinutes;
+                 reminderSecondsInput.value = reminderSeconds;
+                 totalRoundsInput.value = totalRounds;
+                 breakMinutesInput.value = breakMinutes;
+                 breakSecondsInput.value = breakSeconds;
+
+                 let warnings = [];
+                 const discussionTotalSeconds = discussionMinutes * 60 + discussionSeconds;
+
+                 const reminderTotalSeconds = reminderMinutes * 60 + reminderSeconds;
+                 if (reminderTotalSeconds >= discussionTotalSeconds && discussionTotalSeconds > 0) {
+                     let newReminderTotal = Math.max(0, discussionTotalSeconds - 10);
+                     if (newReminderTotal < 0) newReminderTotal = 0;
+                     reminderMinutes = Math.floor(newReminderTotal / 60);
+                     reminderSeconds = newReminderTotal % 60;
+                     reminderMinutesInput.value = reminderMinutes; reminderSecondsInput.value = reminderSeconds;
+                     warnings.push("提醒時間已調整為小於討論時間。");
+                 } else if (discussionTotalSeconds <= 0) { // Reset reminder if discussion time becomes zero
+                      reminderMinutes = 0; reminderSeconds = 0;
+                      reminderMinutesInput.value = reminderMinutes; reminderSecondsInput.value = reminderSeconds;
+                 }
+
+                 // Reset timer state completely to apply new settings from the start
+                 initializeRoundCards(); // Re-initialize cards *after* settings are read
+                 resetTimer(false); // Reset state and UI based on new defaults (sets status to '準備開始')
+
+                 if (warnings.length > 0) {
+                    showNotification(warnings.join(' '), 'warning');
+                 } else {
+                    showNotification('設定已套用', 'info');
+                 }
+                 console.log("Settings applied:", { discussionMinutes, discussionSeconds, reminderMinutes, reminderSeconds, totalRounds, breakMinutes, breakSeconds });
             }
-            
-            // 初始化
-            initAudio();
-            resetTimer();
-            initializeRoundCards();
-            
-            // 事件監聽
-            startBtn.addEventListener('click', startTimer);
-            pauseBtn.addEventListener('click', pauseTimer);
-            resetBtn.addEventListener('click', resetTimer);
-            skipBtn.addEventListener('click', skipToNextRound);
+
+
+            // --- Event Listeners ---
+            startPauseBtn.addEventListener('click', () => {
+                const isFinished = currentRoundNumber > totalRounds && !isBreak;
+
+                if (isFinished) {
+                    startTimer(); // Handles restart logic
+                } else if (isRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer(); // Handles start or resume
+                }
+            });
+            resetBtn.addEventListener('click', () => resetTimer(false));
+            skipBtn.addEventListener('click', skipToNextStage); // Skip manually starts next stage
             applySettings.addEventListener('click', applyNewSettings);
-            testSound.addEventListener('click', () => playSound(soundType.value));
+            testSound.addEventListener('click', () => {
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => playSound(soundType.value));
+                } else {
+                    playSound(soundType.value);
+                }
+            });
+
+             // Input validation on input change
+             [discussionSecondsInput, reminderSecondsInput, breakSecondsInput].forEach(input => {
+                input.addEventListener('input', () => { input.value = Math.max(0, Math.min(59, parseInt(input.value) || 0)); });
+             });
+             [discussionMinutesInput, reminderMinutesInput, breakMinutesInput, totalRoundsInput].forEach(input => {
+                 input.addEventListener('input', () => { input.value = Math.max(input === totalRoundsInput ? 1 : 0, parseInt(input.value) || (input === totalRoundsInput ? 1 : 0)); });
+             });
+
+            // Keyboard Shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.target.matches('input, select, textarea')) return; // Ignore if typing in inputs
+                switch (e.code) {
+                    case 'Space':
+                        e.preventDefault();
+                        // Click the combined start/pause button if it's enabled
+                        if (!startPauseBtn.disabled) startPauseBtn.click();
+                        break;
+                    case 'KeyR': // Reset
+                         e.preventDefault();
+                         if (!resetBtn.disabled) resetBtn.click();
+                         break;
+                    case 'KeyN': // Next (Skip)
+                         e.preventDefault();
+                         if (!skipBtn.disabled) skipBtn.click();
+                         break;
+                    case 'KeyS': // Apply Settings (Less common, but maybe useful)
+                         e.preventDefault();
+                         if (!applySettings.disabled) applySettings.click();
+                         break;
+                }
+            });
+
+            // --- Initial Setup ---
+            initAudio();
+            applyNewSettings(); // Apply default values and initialize UI
+
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'932af438d305075c',t:'MTc0NTA1MDUyNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>

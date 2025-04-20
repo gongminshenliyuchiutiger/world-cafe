@@ -909,7 +909,7 @@
                       let titleStage = isBreak ? `休息 (${currentRoundNumber}/${totalRounds})` : `第 ${currentRoundNumber} 輪`;
                       const isFinished = currentRoundNumber > totalRounds && !isBreak;
                       if (isFinished) titleStage = "已完成";
-                      document.title = `${formatTimerDisplay(displaySeconds)} - ${titleStage} | 輪流站計時`;
+                      document.title = `${formatTimerDisplay(displaySeconds)} - ${titleStage} | 佇註解輪流站計時系統`;
                 }
 
                 // Update circle progress (stroke-dashoffset)
@@ -1100,7 +1100,7 @@
                          }, 1500);
                      } else {
                          console.log("Process has reached the end.");
-                         document.title = '輪流站計時系統 - 已完成';
+                         document.title = '佇註解輪流站計時系統 - 已完成';
                      }
                  } else {
                      animationFrameId = requestAnimationFrame(timerLoop);
